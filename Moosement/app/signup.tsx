@@ -1,33 +1,52 @@
-import { View, Text, Button, TextInput } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
 
 export default function SignupScreen() {
   const router = useRouter();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+  });
+
+  function handleChange(name: string, value: string) {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit() {
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
-      <Text style={styles.label}>Email</Text>
-            <TextInput 
-              style={styles.input}
-              secureTextEntry
-            />
-
-      <Text style={styles.label}>Username</Text>
-            <TextInput 
-              style={styles.input}
-              secureTextEntry
-            />
-
-    <Text style={styles.label}>Password</Text>
-            <TextInput 
-              style={styles.input}
-              secureTextEntry
-            />
-      {/* Replace this button with actual signup logic */}
-      <Button title="Continue to App" onPress={() => router.replace('/(tabs)')} />
+      <Text style={styles.title}>Sign Up</Text>
+      <TextInput 
+        style={styles.input} 
+        placeholder="Full Name" 
+        onChangeText={(value) => handleChange('fullName', value)}
+      />
+      <TextInput 
+        style={styles.input} 
+        placeholder="Email" 
+        keyboardType="email-address" 
+        onChangeText={(value) => handleChange('email', value)}
+      />
+      <TextInput 
+        style={styles.input} 
+        placeholder="Password" 
+        secureTextEntry 
+        onChangeText={(value) => handleChange('password', value)}
+      />
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)')}>
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </TouchableOpacity>
+      <Text style={styles.footerText}>
+        Already have an account?{' '}
+        <Text style={styles.link} /*onPress={() => router.push(login*)}*/>Log in</Text>
+      </Text>
     </View>
   );
 }
@@ -38,11 +57,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 30,
+    backgroundColor: '#f8f9fa',
   },
-  label: {
-    fontSize: 20,
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 20,
+    color: '#660000',
   },
   input: {
     width: '100%',
@@ -50,24 +71,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    marginBottom: 20,
-    marginHorizontal: 20,
-    paddingHorizontal: 20,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 20,
+  button: {
+    backgroundColor: '#cc0000',
+    paddingVertical: 10,
+    width: '100%',
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
   },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 100,
+  footerText: {
+    marginTop: 15,
+    fontSize: 14,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  link: {
+    color: '#cc0000',
+    fontWeight: 'bold',
   },
 });
-
