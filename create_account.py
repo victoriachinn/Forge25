@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from datetime import datetime
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
@@ -25,6 +26,7 @@ def register():
     if users_collection.find_one({"email": email}):
         return jsonify({"error": "User with this email already exists"}), 409
     
+    hashed_password = generate_password_hash(password)
 
     new_user = {
         "name": name,
