@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from datetime import datetime
+from bson import ObjectId
 
 app = Flask(__name__)
 
@@ -14,12 +15,18 @@ def update_profile():
     data = request.get_json()
     
     # Verify user is authenticated (you'll need to implement proper authentication)
-    user_email = data.get("current_email")  # This should come from authentication token in production
-    if not user_email:
+    user_id = data.get("user_id")  # This should come from authentication token in production
+    if not user_id:
         return jsonify({"error": "Authentication required"}), 401
     
+    try:
+        # Convert string ID to MongoDB ObjectId
+        object_id = ObjectId(user_id)
+    except:
+        return jsonify({"error": "Invalid user ID format"}), 400
+    
     # Find the current user
-    current_user = users_collection.find_one({"email": user_email})
+    current_user = users_collection.find_one({"_id": object_id})
     if not current_user:
         return jsonify({"error": "User not found"}), 404
 
@@ -41,9 +48,13 @@ def update_profile():
                 return jsonify({"error": f"Invalid type for field {field}"}), 400
             
             # Email specific validation
-            if field == "email" and data[field] != user_email:
-                # Check if new email already exists
-                if users_collection.find_one({"email": data[field]}):
+            if field == "email":
+                # Check if new email already exists for a different user
+                existing_user = users_collection.find_one({
+                    "email": data[field],
+                    "_id": {"$ne": object_id}  # Exclude current user
+                })
+                if existing_user:
                     return jsonify({"error": "Email already in use"}), 409
             
             updates[field] = data[field]
@@ -57,7 +68,7 @@ def update_profile():
     
     # Perform update
     result = users_collection.update_one(
-        {"email": user_email},
+        {"_id": object_id},
         {"$set": updates}
     )
     
