@@ -33,10 +33,22 @@ def register():
         "email": email,
         "password": hashed_password,
         "points": 0,
-        "joined_date": data.get("joined_date") or datetime.utcnow().isoformat()
+        "joined_date": data.get("joined_date") or datetime.utcnow().isoformat(),
+        "company_id": data.get("company_id"),
+        "team_id": None,
+        "total_points": 0,
+        "completed_challenges": [],
+        "streaks": 0,
+        "role": "employee",  # Default role
+        "rewards_claimed": [],
+        "team_rank": None,
+        "user_avatar": None,
+        "created_at": datetime.utcnow().isoformat(),
+        "updated_at": datetime.utcnow().isoformat()
     }
 
     insert_result = users_collection.insert_one(new_user)
+    return jsonify({"message": "User registered successfully", "user_id": str(insert_result.inserted_id)}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
