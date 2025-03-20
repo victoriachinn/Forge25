@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function SignupScreen() {
+export default function LogInScreen() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    fullName: '',
     email: '',
     password: '',
   });
@@ -22,12 +21,7 @@ export default function SignupScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Full Name" 
-        onChangeText={(value) => handleChange('fullName', value)}
-      />
+      <Text style={styles.title}>Log In</Text>
       <TextInput 
         style={styles.input} 
         placeholder="Email" 
@@ -41,11 +35,11 @@ export default function SignupScreen() {
         onChangeText={(value) => handleChange('password', value)}
       />
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={styles.buttonText}>Log In</Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>
-        Already have an account?{' '}
-        <Text style={styles.link} onPress={() => router.replace('/login')} >Log in </Text>
+        Don't have an account yet? {' '}
+        <Text style={styles.link} onPress={() => router.push('/signup')}>Sign Up</Text>
       </Text>
     </View>
   );
