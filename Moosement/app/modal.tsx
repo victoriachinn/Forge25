@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Alert } from 'react-native';
+import { Platform, StyleSheet, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Alert, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Text } from '@/components/Themed';
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ModalScreen() {
   const [displayName, setDisplayName] = useState('John Doe');
@@ -10,6 +11,8 @@ export default function ModalScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const navigation = useNavigation();
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,22 +28,23 @@ export default function ModalScreen() {
   };
 
   const handleLeaveTeam = () => {
-    // Show confirmation popup for leaving the team
     Alert.alert(
-      "Are you sure?",
-      "This action cannot be undone.",
+      'Are you sure?',
+      'This action cannot be undone.',
       [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "OK",
-          onPress: () => {
-            // Handle the leave team logic here
-            alert('You have left the team.');
-          }
-        }
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: () => alert('You have left the team.') }
+      ]
+    );
+  };
+
+  const handleSave = () => {
+    Alert.alert(
+      'Save Changes?',
+      'Do you want to save your changes?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: () => navigation.goBack() } // Exits the page
       ]
     );
   };
@@ -50,26 +54,29 @@ export default function ModalScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.keyboardAvoidingView}
     >
+      <View style={styles.header}>
+        <Text style={styles.editProfileText}>Edit Profile</Text>
+        <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+          <Text style={styles.saveButtonText}>Save</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-      <Text style={styles.editProfileText}>Edit Profile</Text>
-
         <TouchableOpacity onPress={pickImage}>
           <Image 
-            source={profileImage ? { uri: profileImage } : require('/Users/victoriachin/Desktop/Forge25/Moosement/assets/images/Moosement 2.png')} 
+            source={profileImage ? { uri: profileImage } : require('../assets/images/Moosement 2.png')} 
             style={styles.profileImage} 
             resizeMode="contain"
           />
         </TouchableOpacity>
 
-        {/* "Edit Profile Picture" clickable text */}
         <TouchableOpacity onPress={pickImage}>
           <Text style={styles.editProfilePictureText}>Edit Image</Text>
         </TouchableOpacity>
       
-
         <Text style={styles.label}>Display Name</Text>
         <TextInput
           style={styles.input}
@@ -101,7 +108,6 @@ export default function ModalScreen() {
           keyboardType="email-address"
         />
 
-        {/* Leave Team Button */}
         <TouchableOpacity style={styles.leaveTeamButton} onPress={handleLeaveTeam}>
           <Text style={styles.leaveTeamButtonText}>Leave Team</Text>
         </TouchableOpacity>
@@ -123,6 +129,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingBottom: 50
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: '#f0f0f0',
+  },
+  saveButton: {
+    backgroundColor: '#140E90',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   label: {
     fontSize: 20,
     marginBottom: 5,
@@ -139,27 +164,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     textAlign: 'left',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold'
-  },
   editProfileText: {
-    fontSize: 30, 
+    fontSize: 24, 
     color: '#140E90',
     fontWeight: 'bold',
-    width: '100%', 
-    marginTop: 20,
-    marginBottom: 20,
-    textAlign: 'center',
   },
   profileImage: {
     width: 150,
     height: 150,
-    borderRadius: 75,  // This makes the image circular
-    //marginBottom: ,
-    resizeMode: 'contain',
-    borderWidth: 1,    // Adjust the width of the border (outline)
-    borderColor: '#000', // Set the color of the outline (black here)
+    borderRadius: 75,
+    borderWidth: 1,
+    borderColor: '#000',
+    marginTop: 20,
   },  
   leaveTeamButton: {
     backgroundColor: '#EC4701', 
@@ -168,8 +184,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
-    position: 'absolute',
-    bottom: 70,
   },
   leaveTeamButtonText: {
     color: '#fff',
@@ -179,7 +193,7 @@ const styles = StyleSheet.create({
   editProfilePictureText: {
     marginTop: 2,
     fontSize: 16,
-    color: '#007BFF',
+    color: '#140E90',
     textDecorationLine: 'underline',
     marginBottom: 20,
   },
