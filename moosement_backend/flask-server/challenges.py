@@ -1,16 +1,19 @@
-from flask import Flask, request, jsonify
+# challenges.py
+from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
+from config import config
 
-app = Flask(__name__)
+# Initialize blueprint
+challenges_bp = Blueprint('challenges', __name__)
 
-MONGO_URI = "mongodb+srv://mshteynberg:moosementcluster@moosement.lnn1d.mongodb.net/"
-client = MongoClient(MONGO_URI)
+# Database connection
+client = MongoClient(config.MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
-teams_collection = db["team_data"]
 challenges_collection = db["challenges"]
+teams_collection = db["team_data"]
 
 def update_user_streak(user_id):
     """Update user's streak based on challenge completion history"""
@@ -40,7 +43,14 @@ def update_user_streak(user_id):
     else:  # Streak broken
         return 1
 
-@app.route('/api/challenges/complete', methods=['POST'])
+# Get all challenges
+@challenges_bp.route('/get_challenges', methods=['GET'])
+def get_challenges():
+    challenges_list = list(challenges_collection.find({}, {"_id": 0}))
+    return jsonify({"challenges": challenges_list})
+
+# Complete a challenge
+@challenges_bp.route('/complete', methods=['POST'])
 def complete_challenge():
     try:
         data = request.get_json()
@@ -128,6 +138,3 @@ def complete_challenge():
     except Exception as e:
         # Log the error
         return jsonify({"error": "An error occurred while completing the challenge"}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True) 
