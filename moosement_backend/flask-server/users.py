@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
 from datetime import datetime
 from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 # Initialize the blueprint
 users_bp = Blueprint("users_bp", __name__)
@@ -53,3 +54,57 @@ def register():
 
     insert_result = users_collection.insert_one(new_user)
     return jsonify({"message": "User registered successfully", "user_id": str(insert_result.inserted_id)}), 201
+
+# Route for user login
+@users_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    # Check that the user entered an email and a password
+    required_fields = ["email", "password"]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Missing field: {field}"}), 400
+    
+    email = data["email"]
+    password = data["password"]
+
+    user = users_collection.find_one({"email": email})
+    
+    # If no user exists with that email, return an error
+    if not user:
+        return jsonify({"error": "Invalid email"}), 400
+
+    # Unhashes the stored password and checks if it matches the plaintext password
+    if not check_password_hash(user["password"], password):
+        return jsonify({"error": "Invalid password"}), 400
+    
+    # If login credentials are valid, return a success message
+    return jsonify({"message": "User logged in successfully", "user_id": str(user["_id"])}), 200
+
+# Route for user login
+@users_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    # Check that the user entered an email and a password
+    required_fields = ["email", "password"]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Missing field: {field}"}), 400
+    
+    email = data["email"]
+    password = data["password"]
+
+    user = users_collection.find_one({"email": email})
+    
+    # If no user exists with that email, return an error
+    if not user:
+        return jsonify({"error": "Invalid email"}), 400
+
+    # Unhashes the stored password and checks if it matches the plaintext password
+    if not check_password_hash(user["password"], password):
+        return jsonify({"error": "Invalid password"}), 400
+    
+    # If login credentials are valid, return a success message
+    return jsonify({"message": "User logged in successfully", "user_id": str(user["_id"])}), 200
