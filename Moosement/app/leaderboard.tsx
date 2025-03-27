@@ -1,19 +1,23 @@
 import { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function Leaderboard() {
   const router = useRouter();
   const [leaderboardData] = useState([
-    { id: '1', name: 'Alice', score: 150 },
-    { id: '2', name: 'Bob', score: 120 },
-    { id: '3', name: 'Charlie', score: 100 },
-    { id: '4', name: 'David', score: 90 },
-    { id: '5', name: 'Eve', score: 85 },
+    { id: 'Team 1', name: 'Office Offenders', score: 150 },
+    { id: 'Team 2', name: 'The Staples', score: 120 },
+    { id: 'Team 3', name: 'Dream Team', score: 100 },
+    { id: 'Team 4', name: 'Silly Gooses and Mooses', score: 90 },
+    { id: 'Team 5', name: 'The Franchise', score: 85 },
   ]);
 
   return (
     <View style={styles.container}>
+      <Image
+              style={styles.image} 
+              source={require('../assets/images/Moosement 2.png')} 
+            />
       <Text style={styles.mainTitle}>Leaderboard</Text>
       <FlatList
         data={leaderboardData}
@@ -61,6 +65,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 10,
+  },
+  image: {
+    width: 225,
+    height: 175,
+    marginBottom: 50,
   },
   rank: {
     fontSize: 20,
