@@ -1,31 +1,35 @@
-from flask import Flask, request, jsonify
+# users_bp.py
+from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 
-app = Flask(__name__)
+# Initialize the blueprint
+users_bp = Blueprint("users_bp", __name__)
 
+# MongoDB connection
 MONGO_URI = "mongodb+srv://mshteynberg:moosementcluster@moosement.lnn1d.mongodb.net/"
 client = MongoClient(MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
 
-@app.route('/api/register', methods=['POST'])
+# Route for user registration
+@users_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    
+
     required_fields = ["name", "email", "password"]
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400
-        
+
     name = data["name"]
     email = data["email"]
     password = data["password"]
 
     if users_collection.find_one({"email": email}):
         return jsonify({"error": "User with this email already exists"}), 409
-    
+
     hashed_password = generate_password_hash(password)
 
     new_user = {
@@ -49,6 +53,3 @@ def register():
 
     insert_result = users_collection.insert_one(new_user)
     return jsonify({"message": "User registered successfully", "user_id": str(insert_result.inserted_id)}), 201
-
-if __name__ == '__main__':
-    app.run(debug=True)
