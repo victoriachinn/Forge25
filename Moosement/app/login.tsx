@@ -26,7 +26,7 @@ export default function LogInScreen() {
                 style={styles.image} 
                 source={require('../assets/images/Moosement 2.png')} 
               />
-      <Text style={styles.title}>Log In</Text>
+      <Text style={styles.title}>Sign In</Text>
       <TextInput 
         style={styles.input} 
         placeholder="Email" 
@@ -40,7 +40,7 @@ export default function LogInScreen() {
         onChangeText={(value) => handleChange('password', value)}
       />
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Log In</Text>
+        <Text style={styles.buttonText}>Sign In </Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>
         Don't have an account yet? {' '}
