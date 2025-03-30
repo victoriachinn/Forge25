@@ -18,7 +18,33 @@ export default function SignupScreen() {
   }
 
   async function handleSubmit() {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.fullName,  // Match the backend field name
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('User registered successfully!');
+        router.replace('/login'); // Navigate to login screen after signup
+      } else {
+        alert(data.error || 'Something went wrong.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to connect to the server.');
+    }
   }
+  
 
   return (
     <View style={styles.container}>
@@ -45,13 +71,13 @@ export default function SignupScreen() {
         secureTextEntry 
         onChangeText={(value) => handleChange('password', value)}
       />
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button}  onPress={handleSubmit}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>
         Already have an account?{' '}
-        <Text style={styles.link} onPress={() => router.replace('/login')} >Sign In</Text>
-      </Text>
+
+        <Text style={styles.link} onPress={() => router.replace('/login')} >Sign In</Text>      </Text>
     </View>
   );
 }
