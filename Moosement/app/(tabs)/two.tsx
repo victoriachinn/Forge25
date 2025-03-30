@@ -1,14 +1,16 @@
-import { StyleSheet } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import { router } from 'expo-router';
 
 export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Nicky</Text>
+      <Text style={styles.title}>Tab Hel</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <Button title="Join a Team" onPress={() => router.replace('/join-team')} />
+      <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );
 }
