@@ -10,6 +10,7 @@ export default function TabOneScreen() {
       <Text style={styles.title}>Tab Hel</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Button title="Go Back to Sign Up" onPress={() => router.replace('/signup')} />
+      <Button title="Go Back to LeaderBoard" onPress={() => router.replace('/leaderboard')} />
       <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );
