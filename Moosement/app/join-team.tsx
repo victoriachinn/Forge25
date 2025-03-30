@@ -36,7 +36,7 @@ export default function JoinTeamScreen() {
         <Text style={styles.buttonText}>Join Team</Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>
-        Want to create a team?{' '}
+        Don't have a team to join?{' '}
         {/* TODO: Will re-route to create team page once it is created */}
         <Text style={styles.link} onPress={() => router.replace('/login')} >Create Team</Text>
       </Text>
