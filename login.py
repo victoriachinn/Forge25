@@ -32,7 +32,7 @@ def login():
         return jsonify({"error": "Invalid password"}), 400
     
     # if login credentials are valid: (can change to redirect to home page)
-    return jsonify({"message": "User logged in successfully", "user_id": str(insert_result.inserted_id)}), 200
+    return jsonify({"message": "User logged in successfully", "user_id": str(user["_id"])}), 200
   
 if __name__ == '__main__':
     app.run(debug=True)
