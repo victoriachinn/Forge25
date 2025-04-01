@@ -17,7 +17,30 @@ export default function LogInScreen() {
   }
 
   async function handleSubmit() {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert("Login successful!");
+        console.log("User ID:", data.user_id);
+        router.push('/(tabs)');  
+      } else {
+        alert(data.error || "Login failed");
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      alert("Network error, please try again.");
+    }
   }
+  
 
   return (
     <View style={styles.container}>
@@ -39,7 +62,7 @@ export default function LogInScreen() {
         secureTextEntry 
         onChangeText={(value) => handleChange('password', value)}
       />
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Sign In </Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>
