@@ -24,7 +24,7 @@ const HomeScreen = () => {
         <Text style={styles.greeting}>Good afternoon, {username}</Text>
         <TouchableOpacity>
           <Image
-            source={require("@/assets/profile-icon.png")}
+            source={require("../assets/images/Moosement 2.png")}
             style={styles.profileIcon}
             //onPress={() => navigation.navigate("Profile")}
           />
