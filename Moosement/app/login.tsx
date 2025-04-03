@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Image, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Alert } from 'react-native';
 
 export default function LogInScreen() {
   const router = useRouter();
@@ -17,6 +18,26 @@ export default function LogInScreen() {
   }
 
   async function handleSubmit() {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/users/login', { // Make sure the URL matches your Flask route
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Success", "Logged in successfully!");
+        router.push('/home'); // Redirect to home page or dashboard
+      } else {
+        Alert.alert("Error", data.error || "Login failed. Please try again.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Network error. Please check your connection.");
+    }
   }
 
   return (
