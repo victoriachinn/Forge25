@@ -2,21 +2,11 @@ import { useState } from 'react';
 import { View, Text, TextInput, Button, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function JoinTeamScreen() {
+export default function CreateTeamScreen() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    teamCode: '',
-  });
-
-  function handleChange(name: string, value: string) {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  }
-
-  async function handleSubmit() {
-  }
+  const [teamName, setTeamName] = useState('Silly Mooses');
+  const [teamPrivacy, setTeamPrivacy] = useState('Private');
+  const [teamDescription, setTeamDescription] = useState('');
 
   return (
     <View style={styles.container}>
@@ -25,21 +15,27 @@ export default function JoinTeamScreen() {
         style={styles.image} 
         source={require('../assets/images/Moosement 2.png')} 
       />
-      <Text style={styles.title}>Welcome to Moosement!</Text>
-      <Text style={styles.normalText}>Join or create a team to get started.</Text>
+      <Text style={styles.title}>Create Your Team</Text>
       <TextInput 
         style={styles.input} 
-        placeholder="Team Code" 
-        onChangeText={(value) => handleChange('teamCode', value)}
+        placeholder="Team name" 
+        onChangeText={setTeamName}
       />
+      <TextInput 
+        style={styles.input} 
+        placeholder="Team privacy" 
+        onChangeText={setTeamPrivacy}
+      />
+      <TextInput 
+        style={styles.longerInput}
+        multiline={true}
+        placeholder="Team description (optional)" 
+        onChangeText={setTeamDescription}
+      />
+      
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Join Team</Text>
+        <Text style={styles.buttonText}>Create Team</Text>
       </TouchableOpacity>
-      <Text style={styles.footerText}>
-        Don't have a team to join?{' '}
-        {/* TODO: Will re-route to create team page once it is created */}
-        <Text style={styles.link} onPress={() => router.replace('/login')} >Create Team</Text>
-      </Text>
     </View>
   );
 }
@@ -68,6 +64,8 @@ const styles = StyleSheet.create({
     fontSize:15,
     marginBottom: 20,
     color: '#140E90',
+    textAlign: 'center',
+    flex: 1,
   },
   image: {
     width: 225,
@@ -75,7 +73,7 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   input: {
-    width: '80%',
+    width: '100%',
     height: 40,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -83,6 +81,19 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 10,
     backgroundColor: '#fff',
+  },
+  longerInput: {
+    width: '100%',
+    paddingTop: 10,
+    paddingBottom: 0,
+    height: 80,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
+    textAlignVertical: 'top',
   },
   button: {
     backgroundColor: '#140E90',
@@ -103,5 +114,20 @@ const styles = StyleSheet.create({
   link: {
     color: '#EC4701',
     fontWeight: 'bold',
+  },
+  teamAvatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 75,
+    borderWidth: 1,
+    borderColor: '#000',
+    marginTop: 20,
+  },  
+  editImageText: {
+    marginTop: 2,
+    fontSize: 16,
+    color: '#140E90',
+    textDecorationLine: 'underline',
+    marginBottom: 20,
   },
 });
