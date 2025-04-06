@@ -17,19 +17,19 @@ export default function HomeScreen() {
       
       {/* Content Section */}
       <View style={styles.content}>
-        <TouchableOpacity style={styles.card} onPress={() => router.replace('/(tabs)/two')}>
+        <TouchableOpacity style={styles.card} >
           <Text style={styles.cardText}>ANNOUNCEMENTS</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.card} onPress={() => router.replace('/(tabs)/two')}>
+        <TouchableOpacity style={styles.card} onPress={() => router.replace('/challenges')}>
           <Text style={styles.cardText}>DAILY CHALLENGES</Text>
         </TouchableOpacity>
         
         <View style={styles.row}>
-          <TouchableOpacity style={styles.smallCard} onPress={() => router.replace('/(tabs)/two')}>
+          <TouchableOpacity style={styles.smallCard} onPress={() => router.replace('/activity')}>
             <Text style={styles.cardText}>STREAKS</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.smallCard} onPress={() => router.replace('/(tabs)/two')}>
+          <TouchableOpacity style={styles.smallCard} onPress={() => router.replace('/rewards')}>
             <Text style={styles.cardText}>REWARDS</Text>
           </TouchableOpacity>
         </View>

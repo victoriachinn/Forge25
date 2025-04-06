@@ -5,6 +5,16 @@ import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { Calendar, DateObject } from 'react-native-calendars'; // npx expo install react-native-calendars 
 
+declare module 'react-native-calendars' {
+  export interface DateObject {
+    day: number;       // Day of the month (1-31)
+    month: number;     // Month of the year (1-12)
+    year: number;      // Year (e.g., 2025)
+    timestamp: number; // Unix timestamp representing the date
+    dateString: string; // Date formatted as 'YYYY-MM-DD'
+  }
+}
+
 export default function Activity() {
   const router = useRouter();
 
@@ -22,7 +32,7 @@ export default function Activity() {
 
       <Image
         style={styles.image}
-        source={require('../assets/images/Moosement 2.png')}
+        source={require('../../assets/images/Moosement 2.png')}
       />
 
       <Text style={styles.mainTitle}>Activity</Text>
