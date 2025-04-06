@@ -4,15 +4,17 @@ from pymongo import MongoClient
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+from bson import ObjectId
+from config import config
+
+client = MongoClient(config.MONGO_URI)
+db = client["moosement"]
+users_collection = db["user_data"]
+challenges_collection = db["challenges"]
+teams_collection = db["team_data"]
 
 # Initialize the blueprint
 users_bp = Blueprint("users_bp", __name__)
-
-# MongoDB connection
-MONGO_URI = "mongodb+srv://mshteynberg:moosementcluster@moosement.lnn1d.mongodb.net/"
-client = MongoClient(MONGO_URI)
-db = client["moosement"]
-users_collection = db["user_data"]
 
 # Route for user registration
 @users_bp.route('/register', methods=['POST'])
@@ -82,29 +84,51 @@ def login():
     # If login credentials are valid, return a success message
     return jsonify({"message": "User logged in successfully", "user_id": str(user["_id"])}), 200
 
-# Route for user login
-@users_bp.route('/login', methods=['POST'])
-def login():
+@users_bp.route('/update', methods=['PUT'])
+def update_profile():
     data = request.get_json()
-
-    # Check that the user entered an email and a password
-    required_fields = ["email", "password"]
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"error": f"Missing field: {field}"}), 400
     
-    email = data["email"]
-    password = data["password"]
-
-    user = users_collection.find_one({"email": email})
+    # Verify user is authenticated (you'll need to implement proper authentication)
+    user_id = data.get("user_id")  # This should come from authentication token in production
+    if not user_id:
+        return jsonify({"error": "Authentication required"}), 401
     
-    # If no user exists with that email, return an error
-    if not user:
-        return jsonify({"error": "Invalid email"}), 400
-
-    # Unhashes the stored password and checks if it matches the plaintext password
-    if not check_password_hash(user["password"], password):
-        return jsonify({"error": "Invalid password"}), 400
+    try:
+        # Convert string ID to MongoDB ObjectId
+        object_id = ObjectId(user_id)
+    except:
+        return jsonify({"error": "Invalid user ID format"}), 400
     
-    # If login credentials are valid, return a success message
-    return jsonify({"message": "User logged in successfully", "user_id": str(user["_id"])}), 200
+    # Find the current user
+    current_user = users_collection.find_one({"_id": object_id})
+    if not current_user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Fields that are allowed to be updated
+    updatable_fields = {
+        "name": str,
+        "email": str,
+        "team_id": str,
+        "user_avatar": str,
+        "company_id": str
+    }
+    
+    # Validate and prepare updates
+    updates = {}
+    for field, field_type in updatable_fields.items():
+        if field in data:
+            # Type validation
+            if not isinstance(data[field], field_type):
+                return jsonify({"error": f"Invalid type for field {field}"}), 400
+            
+            # Email specific validation
+            if field == "email":
+                # Check if new email already exists for a different user
+                existing_user = users_collection.find_one({
+                    "email": data[field],
+                    "_id": {"$ne": object_id}  # Exclude current user
+                })
+                if existing_user:
+                    return jsonify({"error": "Email already in use"}), 409
+            
+            updates[field] = data[field]
