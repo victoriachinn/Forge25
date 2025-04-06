@@ -1,17 +1,39 @@
-import { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function Leaderboard() {
   const router = useRouter();
-  const [leaderboardData] = useState([
-    { id: 'Team 1', name: 'Office Offenders', score: 150 },
-    { id: 'Team 2', name: 'The Staples', score: 120 },
-    { id: 'Team 3', name: 'Dream Team', score: 100 },
-    { id: 'Team 4', name: 'Silly Gooses and Mooses', score: 90 },
-    { id: 'Team 5', name: 'The Franchise', score: 85 },
-  ]);
+  type LeaderboardEntry = {
+    id: string;
+    name: string;
+    score: number;
+  };
+  const [leaderboardData, setLeaderboardData] =useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
+
+  const API_URL = "http://localhost:5000/";
+  // if I need to change to IP address of my mac run:
+  //ipconfig getifaddr en0
+  // replace local host with returned address
+  useEffect(() => {
+    fetch('${API_URL}/api/team/leaderboard')
+      .then(response => response.json())
+      .then(data => {
+        const formatted = data.leaderboard.map((team: { team_id: string; total_team_points: number })=> ({
+          id: team.team_id,
+          name: team.team_id,
+          score: team.total_team_points,
+        }));
+        setLeaderboardData(formatted);
+      })
+      .catch(error => {
+        console.error("Error fetching leaderboard:", error);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+  
   return (
     <View style={styles.container}>
       <Image
@@ -19,17 +41,22 @@ export default function Leaderboard() {
               source={require('../assets/images/Moosement 2.png')} 
             />
       <Text style={styles.mainTitle}>Leaderboard</Text>
-      <FlatList
-        data={leaderboardData}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <View style={styles.row}>
-            <Text style={styles.rank}>{index + 1}</Text>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.score}>{item.score}</Text>
-          </View>
-        )}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#140E90" />
+      ) : (
+        <FlatList
+          data={leaderboardData}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item, index }) => (
+            <View style={styles.row}>
+              <Text style={styles.rank}>{index + 1}</Text>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.score}>{item.score}</Text>
+            </View>
+          )}
+        />
+      )}
+
       <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)')}>
         <Text style={styles.buttonText}>Back to Home</Text>
       </TouchableOpacity>
