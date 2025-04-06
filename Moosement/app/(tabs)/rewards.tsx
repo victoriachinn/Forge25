@@ -41,7 +41,8 @@ const RewardsPage: React.FC = () => {
       />
       <Text style={styles.title}>Rewards</Text>
       <Text style={styles.pointLineText}>You have 
-      <span style={styles.pointsText}> {points} </span>points!</Text>
+        <Text style={styles.pointsText}> {points} </Text>
+      points!</Text>
 
       {rewardList.map(reward => (
         <View key={reward.id} style={styles.rewardCard}>
