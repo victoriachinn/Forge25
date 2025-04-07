@@ -1,6 +1,14 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { useRouter } from "expo-router";
 
 export default function CreateTeamScreen() {
   const router = useRouter();
@@ -10,10 +18,10 @@ export default function CreateTeamScreen() {
 
   return (
     <View style={styles.container}>
-    <Text style={styles.mainTitle}>Moosement</Text>
+      <Text style={styles.mainTitle}>Moosement</Text>
       <Image
-        style={styles.image} 
-        source={require('../assets/images/Moosement 2.png')} 
+        style={styles.image}
+        source={require("../assets/images/Moosement 2.png")}
       />
       <Text style={styles.title}>Create Your Team</Text>
       <TextInput 
@@ -43,25 +51,25 @@ export default function CreateTeamScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 30,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   mainTitle: {
     fontSize: 30,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: '#472B01',
+    color: "#472B01",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: '#140E90',
+    color: "#140E90",
   },
   normalText: {
-    fontSize:15,
+    fontSize: 15,
     marginBottom: 20,
     color: '#140E90',
     textAlign: 'center',
@@ -76,11 +84,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 40,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 15,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   longerInput: {
     width: '100%',
@@ -96,24 +104,24 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#140E90',
+    backgroundColor: "#140E90",
     paddingVertical: 10,
-    width: '100%',
+    width: "100%",
     borderRadius: 25,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   footerText: {
     marginTop: 15,
     fontSize: 14,
   },
   link: {
-    color: '#EC4701',
-    fontWeight: 'bold',
+    color: "#EC4701",
+    fontWeight: "bold",
   },
   teamAvatarImage: {
     width: 80,
