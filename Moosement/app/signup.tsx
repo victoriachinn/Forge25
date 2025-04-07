@@ -25,7 +25,7 @@ export default function SignupScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.fullName,  // Match the backend field name
+          name: formData.fullName, 
           email: formData.email,
           password: formData.password,
         }),
@@ -35,7 +35,7 @@ export default function SignupScreen() {
       
       if (response.ok) {
         alert('User registered successfully!');
-        router.replace('/login'); // Navigate to login screen after signup
+        router.replace('/login'); 
       } else {
         alert(data.error || 'Something went wrong.');
       }
