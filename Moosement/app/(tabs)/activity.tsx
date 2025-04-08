@@ -30,11 +30,6 @@ export default function Activity() {
         <MaterialIcons name="arrow-back" size={28} color="black" />
       </TouchableOpacity>
 
-      <Image
-        style={styles.image}
-        source={require('../../assets/images/Moosement 2.png')}
-      />
-
       <Text style={styles.mainTitle}>Activity</Text>
 
       <View style={styles.calendar}>
@@ -100,25 +95,22 @@ export default function Activity() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    paddingTop: 50,
-    backgroundColor: '#f8f9fa',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    backgroundColor: '#f8f9fa',
+    marginTop: -10,
   },
   backButton: {
     alignSelf: 'flex-start',
-    marginBottom: 10,
-  },
-  image: {
-    width: 180,
-    height: 140,
-    marginBottom: 20,
+    paddingTop: 20,
   },
   mainTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#472B01',
     marginBottom: 20,
+    color: '#472B01',
+    textAlign: 'center',
   },
   calendar: {
     width: '100%',
