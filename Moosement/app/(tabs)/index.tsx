@@ -11,6 +11,13 @@ interface Challenge {
   category: string;
 }
 
+interface Reward {
+  id: number;
+  name: string;
+  points: number;
+  redeemed: boolean;
+}
+
 const mockChallenges = [
   {
     name: "Morning Walk",
@@ -20,15 +27,32 @@ const mockChallenges = [
   },
 ];
 
+const mockRewards = [
+  { 
+    id: 1, 
+    name: "Free Lunch Voucher", 
+    points: 150, 
+    redeemed: false 
+  },
+];
+
 export default function HomeScreen() {
   const [firstChallenge, setFirstChallenge] = useState<Challenge | null>(null);
+  const [firstReward, setFirstReward] = useState<Reward | null>(null);
 
   useEffect(() => {
-    // Simulate async fetch
     const loadMockChallenge = async () => {
-      // Add a delay to mimic loading
       await new Promise((resolve) => setTimeout(resolve, 300));
       setFirstChallenge(mockChallenges[0]); // Set the first one
+    };
+
+    loadMockChallenge();
+  }, []);
+
+  useEffect(() => {
+    const loadMockChallenge = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setFirstReward(mockRewards[0]); // Set the first one
     };
 
     loadMockChallenge();
@@ -95,16 +119,29 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.cardBlockHalf}>
-            <Text style={styles.label}>Rewards</Text>
-            <TouchableOpacity
-              style={styles.smallCard}
-              onPress={() => router.replace("/rewards")}
-            />
-          </View>
+          <View style={styles.cardBlock}>
+          <Text style={styles.label}>Rewards</Text>
+          <TouchableOpacity
+            style={styles.smallCard}
+            onPress={() => router.replace("/rewards")}
+          >
+            {firstReward ? (
+              <View style={styles.challengeRow}>
+                {/* Reward name and points */}
+                <View style={styles.description}>
+                  <Text style={styles.cardText}>{firstReward.name}</Text>
+                  <Text style={styles.challengeDescription}>
+                    {firstReward.points}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <Text>Loading...</Text>
+            )}
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.cardBlock}>
+      </View>
+      <View style={styles.cardBlock}>
           <Text style={styles.label}>Leaderboard</Text>
           <TouchableOpacity
             style={styles.card}
@@ -112,8 +149,6 @@ export default function HomeScreen() {
           />
         </View>
       </View>
-
-      {/*Possible Bottom Navigation? */}
     </View>
   );
 }
@@ -149,6 +184,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    width: "100%",
     backgroundColor: "#f8f9fa",
   },
   card: {
@@ -170,12 +206,16 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     height: 80,
-    width: 170,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 15,
+    width: "100%",
+    gap: 15,
   },
   cardText: {
     fontSize: 16,
@@ -209,9 +249,9 @@ const styles = StyleSheet.create({
     color: "#030A36",
   },
   streakContainer: {
-    flexDirection: "row",  
-    justifyContent: "center",  
-    alignItems: "center", 
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 5,
     backgroundColor: "#F0ECEC",
     borderRadius: 10,
@@ -227,6 +267,30 @@ const styles = StyleSheet.create({
     color: "#555",
     marginLeft: 10,
   },
+  rewardCard: {
+    flexDirection: "row",
+    backgroundColor: "#f0eceb",
+    padding: 15,
+    marginBottom: 12,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  rewardImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+  },
+  rewardInfo: {
+    flex: 1,
+  },
+  rewardName: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  rewardPoints: {
+    fontSize: 14,
+    color: "#777",
+  },
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -236,6 +300,8 @@ const styles = StyleSheet.create({
   },
   cardBlock: {
     marginBottom: 15,
+    width: "100%",
+    marginRight: 20,
   },
   cardBlockHalf: {
     width: "48%",
