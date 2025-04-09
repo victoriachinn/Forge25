@@ -45,7 +45,7 @@ export default function Activity() {
             '2025-02-05': { marked: true, dotColor: '#EC4701' },
           }}
           theme={{
-            calendarBackground: '#e6e1dc',
+            calendarBackground: '#fff',
             textSectionTitleColor: '#472B01',
             todayTextColor: '#EC4701',
             dayTextColor: '#000',
@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 15,
-    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 30,
+    backgroundColor: '#fff',
     marginTop: -10,
   },
   backButton: {
@@ -114,10 +114,20 @@ const styles = StyleSheet.create({
   },
   calendar: {
     width: '100%',
-    backgroundColor: '#e6e1dc',
+    backgroundColor: '#e6e1dd',
     borderRadius: 12,
     padding: 16,
     marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   calendarMonth: {
     fontSize: 18,
@@ -136,12 +146,22 @@ const styles = StyleSheet.create({
   },
   streakCard: {
     flexDirection: 'row',
-    backgroundColor: '#e6e1dc',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 15,
     alignItems: 'center',
     width: '100%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   streakText: {
     fontSize: 16,

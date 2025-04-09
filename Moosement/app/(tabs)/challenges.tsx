@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   challengeCard: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
     backgroundColor: '#fff',
     shadowColor: '#000',
