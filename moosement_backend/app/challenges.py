@@ -3,13 +3,13 @@ from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
-import config
+from config import MONGO_URI
 
 # Initialize blueprint
 challenges_bp = Blueprint('challenges_bp', __name__)
 
 # Database connection
-client = MongoClient(config.MONGO_URI)
+client = MongoClient(MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
 challenges_collection = db["challenges"]

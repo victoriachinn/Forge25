@@ -5,9 +5,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from bson import ObjectId
-import config
+from config import MONGO_URI
 
-client = MongoClient(config.MONGO_URI)
+client = MongoClient(MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
 challenges_collection = db["challenges"]
