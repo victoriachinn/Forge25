@@ -4,6 +4,8 @@ from flask_cors import CORS
 from challenges import challenges_bp  # Import the challenges blueprint
 from users import users_bp  # Example of another blueprint for user-related routes
 from teams import teams_bp  # Example of another blueprint for team-related routes
+from moosement_backend.models.rewards import rewards_bp # Example of another blueprint for rewards-related routes
+
 
 def create_app():
     """
@@ -15,7 +17,9 @@ def create_app():
 
     # Register the Blueprint for challenges
     app.register_blueprint(challenges_bp, url_prefix='/api/challenges')
-    
+
+    app.register_blueprint(rewards_bp, url_prefix='/api/rewards')
+
     # Register the Blueprint for users (if you have one)
     app.register_blueprint(users_bp, url_prefix='/api/users')
 
