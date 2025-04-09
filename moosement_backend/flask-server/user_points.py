@@ -17,12 +17,12 @@ def get_user_points():
     # Check that a user_id was received
     if "user_id" not in data:
         return jsonify({"error": "Missing field: user_id"}), 400
-    
+
     user_id = data["user_id"]
 
     try:
         user = users_collection.find_one({"_id": ObjectId(user_id)})
-        
+
         # If no user exists with that ID, return an error
         if not user:
             return jsonify({"error": "Invalid user"}), 400
@@ -33,4 +33,3 @@ def get_user_points():
         }), 200
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching user points"}), 500
-
