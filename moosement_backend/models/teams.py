@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from bson import ObjectId
-from backend.config import config
+from config import config
 import datetime
 
 # Connect to MongoDB
