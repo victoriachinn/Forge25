@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 30,
     backgroundColor: '#f8f9fa',
-    marginTop: -15,
+    marginTop: 80,
   },
   title: {
     fontSize: 24,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     width: 225,
     height: 175,
     marginBottom: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   pointLineText: {
     fontSize:20,
@@ -110,14 +110,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rewardCard: {
-    backgroundColor: '#f0eceb',
-    padding: 5,
+    backgroundColor: '#fff',
+    padding: 16,
     width: 350,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   rewardImage: {
     width: 40,

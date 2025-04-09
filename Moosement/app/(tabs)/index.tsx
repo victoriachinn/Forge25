@@ -28,11 +28,11 @@ const mockChallenges = [
 ];
 
 const mockRewards = [
-  { 
-    id: 1, 
-    name: "Free Lunch Voucher", 
-    points: 150, 
-    redeemed: false 
+  {
+    id: 1,
+    name: "Free Lunch Voucher",
+    points: 150,
+    redeemed: false,
   },
 ];
 
@@ -72,10 +72,6 @@ export default function HomeScreen() {
 
       {/* Content Section */}
       <View style={styles.content}>
-        <TouchableOpacity style={styles.card}>
-          <Text style={styles.cardText}>Team Annoucements</Text>
-        </TouchableOpacity>
-
         <View style={styles.cardBlock}>
           <Text style={styles.label}>Daily Challenge</Text>
           <TouchableOpacity
@@ -105,6 +101,14 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.cardBlock}>
+          <Text style={styles.label}>Leaderboard</Text>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.replace("/leaderboard")}
+          />
+        </View>
+
         <View style={styles.row}>
           <View style={styles.cardBlockHalf}>
             <Text style={styles.label}>Streaks</Text>
@@ -114,39 +118,32 @@ export default function HomeScreen() {
             >
               <View style={styles.streakContainer}>
                 <Text style={styles.streak}>3</Text>
-                <Text style={styles.streakLabel}>days in a row</Text>
+                <Text style={styles.streakLabel}>days walking</Text>
               </View>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.cardBlock}>
-          <Text style={styles.label}>Rewards</Text>
-          <TouchableOpacity
-            style={styles.smallCard}
-            onPress={() => router.replace("/rewards")}
-          >
-            {firstReward ? (
-              <View style={styles.challengeRow}>
-                {/* Reward name and points */}
-                <View style={styles.description}>
-                  <Text style={styles.cardText}>{firstReward.name}</Text>
-                  <Text style={styles.challengeDescription}>
-                    {firstReward.points}
-                  </Text>
+          <View style={styles.cardBlockHalf}>
+            <Text style={styles.label}>Rewards</Text>
+            <TouchableOpacity
+              style={styles.smallCard}
+              onPress={() => router.replace("/rewards")}
+            >
+              {firstReward ? (
+                <View style={styles.challengeRow}>
+                  {/* Reward name and points */}
+                  <View style={styles.description}>
+                    <Text style={styles.cardText}>{firstReward.name}</Text>
+                    <Text style={styles.challengeDescription}>
+                      {firstReward.points}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ) : (
-              <Text>Loading...</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.cardBlock}>
-          <Text style={styles.label}>Leaderboard</Text>
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => router.replace("/leaderboard")}
-          />
+              ) : (
+                <Text>Loading...</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -168,14 +165,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   greeting: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#472B01",
     backgroundColor: "#f8f9fa",
-    paddingBottom: 10,
   },
   name: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#472B01",
   },
@@ -188,11 +184,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   card: {
-    backgroundColor: "#F0ECEC",
-    padding: 20,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     height: 100,
     marginBottom: 15,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#eee",
   },
   image: {
     marginTop: 20,
@@ -202,13 +208,23 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   smallCard: {
-    backgroundColor: "#F0ECEC",
-    padding: 20,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     height: 80,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#eee",
   },
   row: {
     flexDirection: "row",
@@ -223,6 +239,7 @@ const styles = StyleSheet.create({
     color: "#030A36",
   },
   challengeRow: {
+    backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
@@ -230,13 +247,13 @@ const styles = StyleSheet.create({
   description: {
     width: "70%",
     paddingRight: 10,
-    backgroundColor: "#F0ECEC",
+    backgroundColor: "#fff",
   },
   points: {
     width: "30%",
     justifyContent: "center",
     alignItems: "flex-end",
-    backgroundColor: "#F0ECEC",
+    backgroundColor: "#fff",
   },
   challengeDescription: {
     fontSize: 14,
@@ -253,7 +270,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 5,
-    backgroundColor: "#F0ECEC",
+    backgroundColor: "#fff",
     borderRadius: 10,
   },
   streak: {
@@ -269,11 +286,12 @@ const styles = StyleSheet.create({
   },
   rewardCard: {
     flexDirection: "row",
-    backgroundColor: "#f0eceb",
+    backgroundColor: "#fff",
     padding: 15,
     marginBottom: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
+    width: "48%",
   },
   rewardImage: {
     width: 40,
