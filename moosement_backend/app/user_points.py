@@ -1,11 +1,11 @@
 from flask import jsonify, request, Blueprint
 from pymongo import MongoClient
 from bson import ObjectId
-from config import config
+from config import MONGO_URI
 
 user_points_bp = Blueprint('user_points', __name__)
 
-client = MongoClient(config.MONGO_URI)
+client = MongoClient(MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
 

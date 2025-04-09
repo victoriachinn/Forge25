@@ -2,11 +2,11 @@ from flask import Blueprint, request, jsonify
 from models.teams import create_team, join_team
 from models.users import get_user_by_id
 from bson import ObjectId
-import config
+from config import MONGO_URI
 from pymongo import MongoClient
 import shortuuid
 
-client = MongoClient(config.MONGO_URI)
+client = MongoClient(MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
 challenges_collection = db["challenges"]
