@@ -18,6 +18,11 @@ interface Reward {
   redeemed: boolean;
 }
 
+interface LeaderboardEntry {
+  teamName: string;
+  points: number;
+}
+
 const mockChallenges = [
   {
     name: "Morning Walk",
@@ -36,9 +41,16 @@ const mockRewards = [
   },
 ];
 
+const mockLeaderboard: LeaderboardEntry[] = [
+  { teamName: "Team Moose", points: 520 },
+  { teamName: "Trail Blazers", points: 470 },
+  { teamName: "Step Squad", points: 430 },
+];
+
 export default function HomeScreen() {
   const [firstChallenge, setFirstChallenge] = useState<Challenge | null>(null);
   const [firstReward, setFirstReward] = useState<Reward | null>(null);
+  const [topTeams, setTopTeams] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
     const loadMockChallenge = async () => {
@@ -56,6 +68,15 @@ export default function HomeScreen() {
     };
 
     loadMockChallenge();
+  }, []);
+
+  useEffect(() => {
+    const loadMockLeaderboard = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setTopTeams(mockLeaderboard.slice(0, 3)); // Only top 3
+    };
+
+    loadMockLeaderboard();
   }, []);
 
   return (
@@ -106,7 +127,24 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.card}
             onPress={() => router.replace("/leaderboard")}
-          />
+          >
+            {topTeams.length > 0 ? (
+              topTeams.map((team, index) => (
+                <View key={index} style={styles.leaderboardRow}>
+                  <Text style={styles.leaderboardTeam}>
+                    {["①", "②", "③"][index]}
+                    {"  "}
+                    {team.teamName}
+                  </Text>
+                  <Text style={styles.leaderboardPoints}>
+                    {team.points} pts
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <Text>Loading...</Text>
+            )}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.row}>
@@ -130,12 +168,15 @@ export default function HomeScreen() {
               onPress={() => router.replace("/rewards")}
             >
               {firstReward ? (
-                <View style={styles.challengeRow}>
-                  {/* Reward name and points */}
-                  <View style={styles.description}>
-                    <Text style={styles.cardText}>{firstReward.name}</Text>
-                    <Text style={styles.challengeDescription}>
-                      {firstReward.points}
+                <View style={styles.rewardCard}>
+                  <Image
+                    source={require("../../assets/images/rewards-icon.png")}
+                    style={styles.rewardImage}
+                  />
+                  <View style={styles.rewardInfo}>
+                    <Text style={styles.rewardName}>{firstReward.name}</Text>
+                    <Text style={styles.rewardPoints}>
+                      {firstReward.points} pts
                     </Text>
                   </View>
                 </View>
@@ -162,7 +203,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 30,
   },
   greeting: {
     fontSize: 24,
@@ -201,7 +242,7 @@ const styles = StyleSheet.create({
     borderColor: "#eee",
   },
   image: {
-    marginTop: 20,
+    marginTop: 10,
     width: 160,
     height: 125,
     marginBottom: 20,
@@ -263,7 +304,7 @@ const styles = StyleSheet.create({
   challengePoints: {
     fontWeight: "600",
     fontSize: 25,
-    color: "#030A36",
+    color: "#140E90",
   },
   streakContainer: {
     flexDirection: "row",
@@ -276,7 +317,7 @@ const styles = StyleSheet.create({
   streak: {
     fontSize: 40,
     fontWeight: "bold",
-    color: "#030A36",
+    color: "#EC4701",
     marginTop: -10,
   },
   streakLabel: {
@@ -286,16 +327,18 @@ const styles = StyleSheet.create({
   },
   rewardCard: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    padding: 15,
-    marginBottom: 12,
-    borderRadius: 12,
     alignItems: "center",
-    width: "48%",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    elevation: 3,
+    width: "100%",
   },
   rewardImage: {
-    width: 40,
+    width: 30,
     height: 40,
+    marginLeft: -15,
+    marginRight: 20,
     borderRadius: 8,
   },
   rewardInfo: {
@@ -304,10 +347,30 @@ const styles = StyleSheet.create({
   rewardName: {
     fontSize: 16,
     fontWeight: "600",
+    color: "#030A36",
   },
   rewardPoints: {
     fontSize: 14,
     color: "#777",
+  },
+  leaderboardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  leaderboardTeam: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#EC4701", 
+    flex: 1,
+    marginRight: 10, 
+  },
+  leaderboardPoints: {
+    fontSize: 14,
+    color: "#777", 
+    textAlign: "right",
+    width: 60,
   },
   bottomNav: {
     flexDirection: "row",
@@ -328,7 +391,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 5,
-    color: "#030A36",
+    color: "#472B01",
     backgroundColor: "#f8f9fa",
   },
 });
