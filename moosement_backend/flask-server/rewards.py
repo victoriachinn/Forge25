@@ -1,15 +1,17 @@
 from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
+from config import config
 
-app = Flask(__name__)
+rewards_bp = Blueprint('reward', __name__)
 
-MONGO_URI = "mongodb+srv://mshteynberg:moosementcluster@moosement.lnn1d.mongodb.net/"
-client = MongoClient(MONGO_URI)
+client = MongoClient(config.MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
-rewards_collection = db["rewards"]
+challenges_collection = db["challenges"]
+teams_collection = db["team_data"]
 
 # sample rewards
 default_rewards = [
@@ -18,16 +20,12 @@ default_rewards = [
     {"name": "Fitness Gear Credit", "points_required": 7500}
 ]
 
-# initialize rewards in the database if they don't exist
-if rewards_collection.count_documents({}) == 0:
-    rewards_collection.insert_many(default_rewards)
-
-@app.route('/api/rewards', methods=['GET'])
+@rewards_bp.route('/rewards', methods=['GET'])
 def get_rewards():
     rewards = list(rewards_collection.find({}, {"_id": 0}))
     return jsonify({"rewards": rewards})
 
-@app.route('/api/rewards/redeem', methods=['POST'])
+@rewards_bp.route('/api/rewards/redeem', methods=['POST'])
 def redeem_reward():
     data = request.get_json()
     user_id = data.get("user_id")
@@ -68,6 +66,3 @@ def redeem_reward():
         "message": f"Successfully redeemed {reward_name}",
         "remaining_points": user_points - required_points
     }), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
