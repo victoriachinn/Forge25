@@ -12,6 +12,7 @@ interface Challenge {
   points: number;
   category: string;
   completed?: boolean;
+  difficulty?: number; // Difficulty rating from 1-5
 }
 
 // Replace with actual user authentication
@@ -20,6 +21,24 @@ const MOCK_USER_ID = 'abcd';
 const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://api.moosement.com/api'  // Production API (Replace with actual API)
   : 'http://localhost:5000/api';     // Local development API
+
+// Utility function to calculate difficulty rating from points
+const calculateDifficulty = (points: number): number => {
+  // Define our min and max points for scaling
+  // Note: Adjust these values based on your expected point range
+  const minPoints = 10;
+  const maxPoints = 50;
+  
+  // Calculate normalized difficulty (1-5 scale)
+  // Clamp between min and max points, then scale to 1-5
+  const normalizedPoints = Math.max(minPoints, Math.min(maxPoints, points));
+  const difficultyRating = 1 + Math.floor((normalizedPoints - minPoints) / ((maxPoints - minPoints) / 4));
+  
+  return difficultyRating;
+};
+
+// Array of difficulty labels for display
+const difficultyLabels = ['', 'Easy', 'Moderate', 'Challenging', 'Hard', 'Expert'];
 
 export default function ChallengesScreen() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -33,6 +52,14 @@ export default function ChallengesScreen() {
     // Fetch challenges from API
     fetchChallenges();
   }, []);
+
+  // Process challenges data to add difficulty ratings
+  const processChallenges = (challengesData: Challenge[]): Challenge[] => {
+    return challengesData.map(challenge => ({
+      ...challenge,
+      difficulty: calculateDifficulty(challenge.points)
+    }));
+  };
 
   // Fetch challenges from the backend
   const fetchChallenges = async () => {
@@ -49,7 +76,8 @@ export default function ChallengesScreen() {
           const challengesData = Array.isArray(data) ? data : 
                                  data.challenges ? data.challenges : [];
           
-          setChallenges(challengesData);
+          // Process challenges to add difficulty ratings
+          setChallenges(processChallenges(challengesData));
         } catch (parseError) {
           console.log('Error parsing challenges response:', parseError);
           // Fall back to mock data if parsing fails
@@ -114,7 +142,8 @@ export default function ChallengesScreen() {
       }
     ];
     
-    setChallenges(mockChallenges);
+    // Process mock challenges to add difficulty ratings
+    setChallenges(processChallenges(mockChallenges));
   };
 
   // Toggle challenge completion function
@@ -230,11 +259,32 @@ export default function ChallengesScreen() {
 
   const renderChallenge = ({ item }: { item: Challenge }) => {
     const isProcessing = processingIds.includes(item._id);
+    const difficultyLabel = difficultyLabels[item.difficulty || 1];
+    
+    // Function to get difficulty color based on rating - using shades of blue
+    const getDifficultyColor = (rating: number = 1): string => {
+      // Primary blue color: #140E90 (dark blue)
+      switch(rating) {
+        case 1: return '#8F8CD9'; // Lightest blue (20% opacity)
+        case 2: return '#6762C8'; // Light blue (40% opacity)
+        case 3: return '#3F3AB7'; // Medium blue (60% opacity)
+        case 4: return '#2921A3'; // Dark blue (80% opacity)
+        case 5: return '#140E90'; // Darkest blue (original primary color)
+        default: return '#8F8CD9';
+      }
+    };
+    
+    const difficultyColor = getDifficultyColor(item.difficulty);
     
     return (
       <View style={styles.challengeCard}>
         <View style={styles.challengeHeader}>
-          <Text style={styles.challengeName}>{item.name}</Text>
+          <View style={styles.nameContainer}>
+            <Text style={styles.challengeName}>{item.name}</Text>
+            <View style={[styles.difficultyBadge, { backgroundColor: difficultyColor }]}>
+              <Text style={styles.difficultyText}>{difficultyLabel}</Text>
+            </View>
+          </View>
           <Text style={styles.challengePoints}>{item.points} pts</Text>
         </View>
         <Text style={styles.challengeDescription}>{item.description}</Text>
@@ -401,10 +451,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
   challengeName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#000000',
+    marginRight: 8,
   },
   challengePoints: {
     fontSize: 16,
@@ -420,6 +477,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
     textTransform: 'uppercase',
+    flex: 1,
   },
   challengeFooter: {
     flexDirection: 'row',
@@ -427,9 +485,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  difficultyBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 10,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  difficultyText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#fff',
+    textAlign: 'center',
+  },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 8,
   },
   checkbox: {
     width: 24,
