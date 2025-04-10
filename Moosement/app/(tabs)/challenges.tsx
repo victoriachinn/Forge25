@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, ActivityIndicator, TouchableOpacity, SectionList, Alert } from 'react-native';
-import { Text, View, useThemeColor } from '@/components/Themed';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, ActivityIndicator, TouchableOpacity, SectionList, Alert, Modal, Image, Animated } from 'react-native';
+import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
+// ---------- Constants ----------
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://api.moosement.com/api'  // Production API
+  : 'http://localhost:5000/api';     // Development API
+
+const MOCK_USER_ID = 'abcd';
+const difficultyLabels = ['', 'Easy', 'Moderate', 'Challenging', 'Hard', 'Expert'];
+
+// ---------- Types ----------
 interface Challenge {
   _id: string;
   name: string;
@@ -12,64 +22,135 @@ interface Challenge {
   points: number;
   category: string;
   completed?: boolean;
+  difficulty?: number;
+  verificationPhoto?: string;
 }
 
-// Replace with actual user authentication
-const MOCK_USER_ID = 'abcd';
+// ---------- Utility Functions ----------
+const calculateDifficulty = (points: number): number => {
+  const minPoints = 10;
+  const maxPoints = 50;
+  const normalizedPoints = Math.max(minPoints, Math.min(maxPoints, points));
+  return 1 + Math.floor((normalizedPoints - minPoints) / ((maxPoints - minPoints) / 4));
+};
 
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://api.moosement.com/api'  // Production API (Replace with actual API)
-  : 'http://localhost:5000/api';     // Local development API
+const getDifficultyColor = (rating: number = 1): string => {
+  switch(rating) {
+    case 1: return '#8F8CD9'; // Lightest blue
+    case 2: return '#6762C8'; // Light blue
+    case 3: return '#3F3AB7'; // Medium blue
+    case 4: return '#2921A3'; // Dark blue
+    case 5: return '#140E90'; // Darkest blue
+    default: return '#8F8CD9';
+  }
+};
 
 export default function ChallengesScreen() {
+  // ---------- State ----------
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingIds, setProcessingIds] = useState<string[]>([]);
+  const [photoModalVisible, setPhotoModalVisible] = useState(false);
+  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  
+  // ---------- Animation Refs ----------
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial opacity value for background overlay
+  const slideAnim = useRef(new Animated.Value(100)).current; // Initial position for modal content
+  
+  // ---------- Theme ----------
   const colorScheme = useColorScheme();
-  const tintColor = Colors[colorScheme ?? 'light'].tint;
   const primaryColor = '#140E90'; // Main blue color used throughout the app
 
+  // ---------- Animation Effects ----------
   useEffect(() => {
-    // Fetch challenges from API
+    if (photoModalVisible) {
+      // Parallel animations for fade in and slide up
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        })
+      ]).start();
+    } else {
+      // Parallel animations for fade out and slide down
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 100,
+          duration: 300,
+          useNativeDriver: true,
+        })
+      ]).start();
+    }
+  }, [photoModalVisible, fadeAnim, slideAnim]);
+
+  // ---------- Initial Setup ----------
+  useEffect(() => {
     fetchChallenges();
+    requestPermissions();
   }, []);
 
-  // Fetch challenges from the backend
+  // ---------- Permission Handling ----------
+  const requestPermissions = async () => {
+    const [cameraPermission, photoPermission] = await Promise.all([
+      ImagePicker.requestCameraPermissionsAsync(),
+      ImagePicker.requestMediaLibraryPermissionsAsync()
+    ]);
+    
+    if (cameraPermission.status !== 'granted' || photoPermission.status !== 'granted') {
+      Alert.alert(
+        'Permissions Required',
+        'Sorry, we need camera and photo library permissions to verify your challenges.',
+        [{ text: 'OK', style: 'default' }]
+      );
+    }
+  };
+
+  // ---------- Data Fetching ----------
   const fetchChallenges = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/challenges`);
       
       if (response.ok) {
-        let data;
         try {
           const text = await response.text();
-          data = text ? JSON.parse(text) : [];
-          
-          // Backend might return { challenges: [...] } or just the array
-          const challengesData = Array.isArray(data) ? data : 
-                                 data.challenges ? data.challenges : [];
-          
-          setChallenges(challengesData);
+          const data = text ? JSON.parse(text) : [];
+          const challengesData = Array.isArray(data) ? data : data.challenges ? data.challenges : [];
+          setChallenges(processChallenges(challengesData));
         } catch (parseError) {
           console.log('Error parsing challenges response:', parseError);
-          // Fall back to mock data if parsing fails
           setMockChallenges();
         }
       } else {
         console.log('Failed to fetch challenges, status:', response.status);
-        // Fall back to mock data if API call fails
         setMockChallenges();
       }
     } catch (error) {
       console.log('Error fetching challenges:', error);
-      // Fall back to mock data if API call fails
       setMockChallenges();
     } finally {
       setLoading(false);
     }
   };
 
-  // Set mock challenges as fallback
+  const processChallenges = (challengesData: Challenge[]): Challenge[] => {
+    return challengesData.map(challenge => ({
+      ...challenge,
+      difficulty: calculateDifficulty(challenge.points)
+    }));
+  };
+
   const setMockChallenges = () => {
     const mockChallenges: Challenge[] = [
       {
@@ -114,12 +195,15 @@ export default function ChallengesScreen() {
       }
     ];
     
-    setChallenges(mockChallenges);
+    setChallenges(processChallenges(mockChallenges));
   };
 
-  // Toggle challenge completion function
-  const toggleChallengeCompletion = async (challengeId: string, currentlyCompleted: boolean) => {
-    // Add to processing state
+  // ---------- Challenge Action Handlers ----------
+  const handleCompletePress = (challenge: Challenge) => {
+    openPhotoModal({...challenge, completed: false}, null);
+  };
+  
+  const toggleChallengeCompletion = async (challengeId: string, currentlyCompleted: boolean, verificationPhoto?: string) => {
     setProcessingIds(prev => [...prev, challengeId]);
     
     try {
@@ -127,137 +211,146 @@ export default function ChallengesScreen() {
       setChallenges(prevChallenges => 
         prevChallenges.map(challenge => 
           challenge._id === challengeId 
-            ? { ...challenge, completed: !currentlyCompleted } 
+            ? { ...challenge, completed: !currentlyCompleted, verificationPhoto } 
             : challenge
         )
       );
 
-      if (!currentlyCompleted) {
-        // COMPLETE THE CHALLENGE
-        try {
-          const apiUrl = `${API_BASE_URL}/challenges/complete`;
-          
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              user_id: MOCK_USER_ID,
-              challenge_id: challengeId,
-            }),
-          }).catch(error => {
-            // Silently handle network errors when backend isn't available
-            console.log('Network error (expected during development):', error.message);
-            return null;
-          });
-          
-          if (response && response.ok) {
-            let result;
-            try {
-              const text = await response.text();
-              result = text ? JSON.parse(text) : {};
-              console.log('Challenge completed successfully:', result);
-            } catch (parseError) {
-              console.log('Error parsing JSON response:', parseError);
-            }
-          } else if (response) {
-            let errorData = {};
-            try {
-              const text = await response.text();
-              errorData = text ? JSON.parse(text) : {};
-            } catch (parseError) {
-              console.log('Error parsing JSON error response');
-            }
-            
-            console.log('Error completing challenge:', errorData);
-            
-            // Even with API error, keep UI state updated for better experience
-            if (errorData && typeof errorData === 'object' && 'error' in errorData) {
-              console.log('Challenge was already completed today');
-            }
-          }
-        } catch (error) {
-          console.log('Error in challenge completion');
+      // API call - for non-mocked implementation
+      const endpoint = !currentlyCompleted ? '/challenges/complete' : '/challenges/undo';
+      const requestBody: any = {
+        user_id: MOCK_USER_ID,
+        challenge_id: challengeId,
+      };
+      
+      if (!currentlyCompleted && verificationPhoto) {
+        requestBody.verification_photo = verificationPhoto;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        }).catch(error => {
+          console.log('Network error (expected during development):', error.message);
+          return null;
+        });
+        
+        if (response && response.ok) {
+          console.log('Challenge status updated successfully');
         }
-      } else {
-        // UNDO THE CHALLENGE COMPLETION
-        try {
-          const apiUrl = `${API_BASE_URL}/challenges/undo`;
-          
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              user_id: MOCK_USER_ID,
-              challenge_id: challengeId,
-            }),
-          }).catch(error => {
-            console.log('Network error (expected during development):', error.message);
-            return null;
-          });
-          
-          if (response && response.ok) {
-            let result;
-            try {
-              const text = await response.text();
-              result = text ? JSON.parse(text) : {};
-              console.log('Challenge completion undone successfully:', result);
-            } catch (parseError) {
-              console.log('Error parsing JSON response');
-            }
-          } else if (response) {
-            console.log('Error undoing challenge completion');
-          }
-        } catch (error) {
-          console.log('Error undoing challenge completion');
-        }
+      } catch (error) {
+        console.log(`Error ${!currentlyCompleted ? 'completing' : 'undoing'} challenge`);
       }
     } catch (error) {
       console.log('Error toggling challenge:', error);
-      // Show a more informative message during development
-      Alert.alert(
-        'Update Status', 
-        'Challenge status updated locally. Server sync may have failed.'
-      );
     } finally {
-      // Remove from processing
       setProcessingIds(prev => prev.filter(id => id !== challengeId));
     }
   };
 
+  // ---------- Photo Handling ----------
+  const takePhoto = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+      });
+      
+      if (!result.canceled) {
+        setPhotoUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to take photo');
+    }
+  };
+  
+  const pickPhoto = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+      });
+      
+      if (!result.canceled) {
+        setPhotoUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to select photo');
+    }
+  };
+  
+  const submitChallengeWithPhoto = async () => {
+    if (!selectedChallenge || !photoUri) {
+      Alert.alert('Error', 'Please provide a verification photo');
+      return;
+    }
+    
+    setPhotoModalVisible(false);
+    await toggleChallengeCompletion(selectedChallenge._id, false, photoUri);
+  };
+
+  // ---------- Modal Handlers ----------
+  const openPhotoModal = (challenge: Challenge, photo: string | null = null) => {
+    setSelectedChallenge(challenge);
+    setPhotoUri(photo);
+    setPhotoModalVisible(true);
+  };
+
+  const closePhotoModal = () => {
+    // Fade out animation will start automatically due to useEffect
+    setPhotoModalVisible(false);
+  };
+
+  // ---------- Render Functions ----------
   const renderChallenge = ({ item }: { item: Challenge }) => {
     const isProcessing = processingIds.includes(item._id);
+    const difficultyLabel = difficultyLabels[item.difficulty || 1];
+    const difficultyColor = getDifficultyColor(item.difficulty);
     
     return (
       <View style={styles.challengeCard}>
         <View style={styles.challengeHeader}>
-          <Text style={styles.challengeName}>{item.name}</Text>
+          <View style={styles.nameContainer}>
+            <Text style={styles.challengeName}>{item.name}</Text>
+            <View style={[styles.difficultyBadge, { backgroundColor: difficultyColor }]}>
+              <Text style={styles.difficultyText}>{difficultyLabel}</Text>
+            </View>
+          </View>
           <Text style={styles.challengePoints}>{item.points} pts</Text>
         </View>
         <Text style={styles.challengeDescription}>{item.description}</Text>
         <View style={styles.challengeFooter}>
           <Text style={styles.challengeCategory}>{item.category}</Text>
-          <TouchableOpacity 
-            style={styles.checkboxContainer}
-            onPress={() => toggleChallengeCompletion(item._id, item.completed || false)}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <ActivityIndicator size="small" color={primaryColor} style={styles.checkbox} />
-            ) : item.completed ? (
-              <View style={[styles.checkbox, { backgroundColor: primaryColor }]}>
-                <Ionicons name="checkmark" size={18} color="#FFFFFF" />
-              </View>
-            ) : (
-              <View style={[styles.checkboxEmpty, { borderColor: primaryColor }]} />
-            )}
-            <Text style={[styles.checkboxText, { color: primaryColor }]}>
-              {item.completed ? 'Completed' : 'Complete'}
-            </Text>
-          </TouchableOpacity>
+          {item.completed ? (
+            <View style={styles.completedContainer}>
+              <Ionicons name="checkmark-circle" size={18} color={primaryColor} style={styles.completedIcon} />
+              <Text style={[styles.completedText, { color: primaryColor }]}>Completed</Text>
+              {item.verificationPhoto && (
+                <TouchableOpacity 
+                  style={styles.viewPhotoButton}
+                  onPress={() => openPhotoModal(item, item.verificationPhoto || null)}
+                >
+                  <Text style={styles.viewPhotoText}>View Photo</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : (
+            <TouchableOpacity 
+              style={[styles.completeButton, { backgroundColor: primaryColor }]}
+              onPress={() => handleCompletePress(item)}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Text style={styles.completeButtonText}>Complete</Text>
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
@@ -267,38 +360,7 @@ export default function ChallengesScreen() {
     <Text style={styles.sectionHeader}>{title}</Text>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={primaryColor} />
-      </View>
-    );
-  }
-
-  // Prepare data for sectioned list
-  const pendingChallenges = challenges.filter(challenge => !challenge.completed);
-  const completedChallenges = challenges.filter(challenge => challenge.completed);
-  
-  // Create sections array with logic for empty pending challenges
-  const sections = [
-    { 
-      title: "Today's Challenges", 
-      data: pendingChallenges.length > 0 ? pendingChallenges : ['completed_all'] 
-    },
-    { 
-      title: 'Completed Challenges', 
-      data: completedChallenges 
-    }
-  ];
-
-  // Only show the "Completed Challenges" section if there are completed challenges
-  const filteredSections = completedChallenges.length > 0 
-    ? sections 
-    : [sections[0]];
-
-  // Custom render function to handle both challenge items and the "all completed" message
   const renderItem = ({ item, section }: { item: Challenge | string, section: { title: string } }) => {
-    // If this is our special "completed_all" placeholder, render the congratulations message
     if (item === 'completed_all') {
       return (
         <View style={styles.allCompletedContainer}>
@@ -310,10 +372,38 @@ export default function ChallengesScreen() {
       );
     }
     
-    // Otherwise render a normal challenge
     return renderChallenge({ item: item as Challenge });
   };
 
+  // ---------- Loading State ----------
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={primaryColor} />
+      </View>
+    );
+  }
+
+  // ---------- SectionList Data Preparation ----------
+  const pendingChallenges = challenges.filter(challenge => !challenge.completed);
+  const completedChallenges = challenges.filter(challenge => challenge.completed);
+  
+  const sections = [
+    { 
+      title: "Today's Challenges", 
+      data: pendingChallenges.length > 0 ? pendingChallenges : ['completed_all'] 
+    },
+    { 
+      title: 'Completed Challenges', 
+      data: completedChallenges 
+    }
+  ];
+
+  const filteredSections = completedChallenges.length > 0 
+    ? sections 
+    : [sections[0]];
+
+  // ---------- Main UI Rendering ----------
   return (
     <View style={styles.container}>
       <SectionList
@@ -324,7 +414,104 @@ export default function ChallengesScreen() {
         stickySectionHeadersEnabled={false}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        contentInset={{ bottom: 70 }}
+        contentOffset={{ x: 0, y: 0 }}
+        contentInsetAdjustmentBehavior="automatic"
+        automaticallyAdjustContentInsets={true}
       />
+
+      {/* Photo Verification Modal */}
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={photoModalVisible}
+        onRequestClose={closePhotoModal}
+        statusBarTranslucent={true}
+      >
+        <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
+          <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
+            {selectedChallenge?.completed ? (
+              // View mode for completed challenges
+              <>
+                <Text style={styles.modalTitle}>Verification Photo</Text>
+                <View style={styles.photoPreviewContainer}>
+                  {photoUri && <Image source={{ uri: photoUri }} style={styles.photoPreview} />}
+                </View>
+                <TouchableOpacity 
+                  style={styles.modalCancelButton}
+                  onPress={closePhotoModal}
+                >
+                  <Text style={styles.modalCancelText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              // Submission mode for new challenges
+              <>
+                <Text style={styles.modalTitle}>
+                  {photoUri ? 'Confirm Photo' : selectedChallenge?.name}
+                </Text>
+                
+                {photoUri ? (
+                  <View style={styles.photoPreviewContainer}>
+                    <Image source={{ uri: photoUri }} style={styles.photoPreview} />
+                    <Text style={styles.warningText}>
+                      You won't be able to change this photo once you submit the challenge.
+                    </Text>
+                    <TouchableOpacity 
+                      style={styles.changePhotoButton}
+                      onPress={() => setPhotoUri(null)}
+                    >
+                      <Text style={styles.changePhotoText}>Change Photo</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <Text style={styles.modalInstructions}>
+                    Take or upload a photo to verify you've completed this challenge.
+                  </Text>
+                )}
+                
+                <View style={styles.modalButtons}>
+                  {!photoUri && (
+                    <>
+                      <TouchableOpacity 
+                        style={[styles.modalButton, { backgroundColor: primaryColor }]}
+                        onPress={takePhoto}
+                      >
+                        <Ionicons name="camera" size={18} color="#FFFFFF" style={styles.buttonIcon} />
+                        <Text style={styles.modalButtonText}>Take Photo</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={[styles.modalButton, { backgroundColor: primaryColor }]}
+                        onPress={pickPhoto}
+                      >
+                        <Ionicons name="images" size={18} color="#FFFFFF" style={styles.buttonIcon} />
+                        <Text style={styles.modalButtonText}>Choose Photo</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                  
+                  {photoUri && (
+                    <TouchableOpacity 
+                      style={[styles.modalButton, { backgroundColor: primaryColor }]}
+                      onPress={submitChallengeWithPhoto}
+                    >
+                      <Text style={styles.modalButtonText}>Submit Challenge</Text>
+                    </TouchableOpacity>
+                  )}
+                  
+                  <TouchableOpacity 
+                    style={styles.modalCancelButton}
+                    onPress={closePhotoModal}
+                  >
+                    <Text style={styles.modalCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </Animated.View>
+        </Animated.View>
+      </Modal>
     </View>
   );
 }
@@ -332,11 +519,6 @@ export default function ChallengesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 15,
-    backgroundColor: '#f8f9fa',
-    paddingTop: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -352,10 +534,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -381,7 +560,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   listContainer: {
-    paddingBottom: 16,
+    paddingBottom: 100,
   },
   challengeCard: {
     padding: 16,
@@ -389,10 +568,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -405,10 +581,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
   challengeName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#000000',
+    marginRight: 8,
   },
   challengePoints: {
     fontSize: 16,
@@ -424,6 +607,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
     textTransform: 'uppercase',
+    flex: 1,
   },
   challengeFooter: {
     flexDirection: 'row',
@@ -431,28 +615,160 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
-  checkboxContainer: {
+  difficultyBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 10,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  difficultyText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  completedContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
   },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
+  completedIcon: {
+    marginRight: 4,
+  },
+  completedText: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginRight: 8,
+  },
+  viewPhotoButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#140E90',
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  viewPhotoText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#140E90',
+  },
+  completeButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  completeButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  modalOverlay: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  checkboxEmpty: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    borderWidth: 2,
-    backgroundColor: 'transparent',
-    marginRight: 8,
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 16,
+    width: '85%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  checkboxText: {
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#140E90',
+    textAlign: 'center',
+  },
+  photoPreviewContainer: {
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  photoPreview: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  changePhotoButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: '#140E90',
+    borderRadius: 8,
+  },
+  changePhotoText: {
     fontSize: 14,
+    fontWeight: '600',
+    color: '#140E90',
+    textAlign: 'center',
+  },
+  modalInstructions: {
+    fontSize: 15,
+    marginBottom: 20,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  modalButtons: {
+    marginTop: 16,
+    flexDirection: 'column',
+    width: '100%',
+  },
+  modalButton: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  buttonIcon: {
+    marginRight: 8,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  modalCancelButton: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 4,
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: '#E0E0E0',
+  },
+  modalCancelText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#555555',
+  },
+  warningText: {
+    fontSize: 13,
+    color: '#777777',
+    marginTop: 4,
+    marginBottom: 16,
+    textAlign: 'center',
     fontWeight: '500',
   },
 }); 
