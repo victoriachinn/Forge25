@@ -1,10 +1,10 @@
 from pymongo import MongoClient
 from bson import ObjectId
-from config import config
+from config import MONGO_URI
 import datetime
 
 # Connect to MongoDB
-client = MongoClient(config.MONGO_URI)
+client = MongoClient(MONGO_URI)
 db = client["moosement"]
 teams_collection = db["teams"]
 users_collection = db["users"]
