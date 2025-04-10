@@ -35,11 +35,11 @@ const RewardsPage: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.title}>Rewards</Text>
       <Image
         style={styles.image} 
         source={require('../../assets/images/Moosement 2.png')} 
       />
-      <Text style={styles.title}>Rewards</Text>
       <Text style={styles.pointLineText}>You have 
         <Text style={styles.pointsText}> {points} </Text>
       points!</Text>
@@ -79,20 +79,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 30,
     backgroundColor: '#f8f9fa',
-    paddingTop: 15,
+    marginTop: 80,
   },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 12,
     color: '#472B01',
+    textAlign: 'center',
   },
   image: {
     width: 225,
     height: 175,
-    marginBottom: 50,
-    justifyContent: 'center'
+    marginBottom: 20,
+    justifyContent: 'center',
   },
   pointLineText: {
     fontSize:20,
@@ -109,14 +110,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rewardCard: {
-    backgroundColor: '#f0eceb',
-    padding: 5,
+    backgroundColor: '#fff',
+    padding: 16,
     width: 350,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   rewardImage: {
     width: 40,

@@ -519,10 +519,6 @@ export default function ChallengesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 16,
-    paddingHorizontal: 16,
-    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
@@ -559,15 +555,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 16,
-    marginBottom: 12,
-    color: '#140E90',
+    marginBottom: 20,
+    color: '#472B01',
+    textAlign: 'center',
   },
   listContainer: {
     paddingBottom: 100,
   },
   challengeCard: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
     backgroundColor: '#fff',
     shadowColor: '#000',
