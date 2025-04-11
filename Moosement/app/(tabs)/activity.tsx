@@ -98,7 +98,7 @@ export default function Activity() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push("/(tabs)")}
+        onPress={() => router.push("/home")}
       >
         <Text style={styles.buttonText}>Back to Home</Text>
       </TouchableOpacity>
