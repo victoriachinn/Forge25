@@ -38,7 +38,7 @@ export default function Leaderboard() {
     <View style={styles.container}>
       <Image
               style={styles.image} 
-              source={require('../assets/images/Moosement 2.png')} 
+              source={require('../../assets/images/Moosement 2.png')} 
             />
       <Text style={styles.mainTitle}>Leaderboard</Text>
       {loading ? (
@@ -57,7 +57,7 @@ export default function Leaderboard() {
         />
       )}
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)')}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
         <Text style={styles.buttonText}>Back to Home</Text>
       </TouchableOpacity>
     </View>

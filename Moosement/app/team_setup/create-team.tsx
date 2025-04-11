@@ -21,7 +21,7 @@ export default function CreateTeamScreen() {
       <Text style={styles.mainTitle}>Moosement</Text>
       <Image
         style={styles.image}
-        source={require("../assets/images/Moosement 2.png")}
+        source={require("../../assets/images/Moosement 2.png")}
       />
       <Text style={styles.title}>Create Your Team</Text>
       <TextInput 

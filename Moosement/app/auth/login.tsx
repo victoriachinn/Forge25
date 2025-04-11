@@ -27,7 +27,7 @@ export default function LogInScreen() {
 
   async function handleSubmit() {
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/login", {
+      const response = await fetch("http://127.0.0.1:3000/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function LogInScreen() {
       if (response.ok) {
         alert("Login successful!");
         console.log("User ID:", data.user_id);
-        router.push("/(tabs)");
+        router.push("/(tabs)/home");
       } else {
         alert(data.error || "Login failed");
       }
@@ -48,13 +48,14 @@ export default function LogInScreen() {
       console.error("Error logging in:", error);
       alert("Network error, please try again.");
     }
+  }
 
     return (
       <View style={styles.container}>
         <Text style={styles.mainTitle}>Moosement</Text>
         <Image
           style={styles.image}
-          source={require("../assets/images/Moosement 2.png")}
+          source={require("../../assets/images/Moosement 2.png")}
         />
         <Text style={styles.title}>Sign In</Text>
         <TextInput
@@ -74,7 +75,7 @@ export default function LogInScreen() {
         </TouchableOpacity>
         <Text style={styles.footerText}>
           Don't have an account yet?{" "}
-          <Text style={styles.link} onPress={() => router.push("/signup")}>
+          <Text style={styles.link} onPress={() => router.push("/auth/signup")}>
             Sign Up
           </Text>
         </Text>
@@ -138,4 +139,4 @@ export default function LogInScreen() {
       fontWeight: "bold",
     },
   });
-}
+
