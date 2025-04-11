@@ -19,7 +19,7 @@ export default function SignupScreen() {
 
   async function handleSubmit() {
     try {
-      const response = await fetch('http://10.110.76.233:3000/register', {
+      const response = await fetch('http://10.110.76.233:3000/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,12 +35,15 @@ export default function SignupScreen() {
       
       if (response.ok) {
         alert('User registered successfully!');
+        console.log("got it")
         router.replace('/(tabs)/home'); 
       } else {
+        console.log(data.error)
+
         alert(data.error || 'Something went wrong.');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:', error);
       alert('Failed to connect to the server.');
     }
   }

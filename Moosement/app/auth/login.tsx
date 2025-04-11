@@ -27,7 +27,7 @@ export default function LogInScreen() {
 
   async function handleSubmit() {
     try {
-      const response = await fetch("http://127.0.0.1:3000/api/login", {
+      const response = await fetch("http://10.110.76.233:3000/api/login", { // may need to put your own IP address
         method: "POST",
         headers: {
           "Content-Type": "application/json",
