@@ -561,6 +561,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 100,
+    paddingHorizontal: 16,
   },
   challengeCard: {
     padding: 16,
