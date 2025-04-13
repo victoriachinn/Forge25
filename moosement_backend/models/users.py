@@ -2,11 +2,14 @@ from pymongo import MongoClient
 from bson import ObjectId
 import datetime
 from config import MONGO_URI
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+import certifi
 
-# Connect to MongoDB
-client = MongoClient(MONGO_URI)
+# Create a new client and connect to the server
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), tls=True, tlsCAFile=certifi.where())
 db = client["moosement"]
-users_collection = db["users"]
+users_collection = db["user_data"]
 
 # ---- User Schema ----
 USER_SCHEMA = {
@@ -48,8 +51,14 @@ def get_user_by_id(user_id):
     """
     Fetches a user by their unique user ID.
     """
-    user = users_collection.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
-    return user
+    try:
+        _id = ObjectId(user_id)
+        user = users_collection.find_one({"_id": user_id}, {"_id": 0, "password_hash": 0})
+        return user
+
+    except Exception as e:
+        return {"error": "Invalid user ID format"}
+
 
 
 def get_user_by_email(email):
