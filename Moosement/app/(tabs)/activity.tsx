@@ -1,28 +1,60 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
-import { Calendar, DateObject } from 'react-native-calendars'; // npx expo install react-native-calendars 
+import { Calendar, DateObject } from 'react-native-calendars';
+import axios from 'axios';
 
 declare module 'react-native-calendars' {
   export interface DateObject {
-    day: number;       // Day of the month (1-31)
-    month: number;     // Month of the year (1-12)
-    year: number;      // Year (e.g., 2025)
-    timestamp: number; // Unix timestamp representing the date
-    dateString: string; // Date formatted as 'YYYY-MM-DD'
+    day: number;
+    month: number;
+    year: number;
+    timestamp: number;
+    dateString: string;
   }
 }
 
+type Challenge = {
+  _id: string;
+  date: string; // ISO format like "2025-02-01"
+  activity: string;
+  icon: string;
+  streak: number;
+};
+
 export default function Activity() {
   const router = useRouter();
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [markedDates, setMarkedDates] = useState<Record<string, { marked: boolean; dotColor: string }>>({});
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<Challenge | null>(null);
 
-  const challenges = [
-    { id: '1', date: 'Feb 1', activity: 'Walking', icon: 'walking', streak: 4 },
-    { id: '2', date: 'Feb 4', activity: 'Yoga', icon: 'spa', streak: 3 },
-    { id: '3', date: 'Feb 5', activity: 'Cycling', icon: 'biking', streak: 2 },
-  ];
+  const fetchChallenges = async () => {
+    try {
+      const userId = "67fc133a9de9b74b88dfbee8"
+      if (!userId) throw new Error('User ID not found');
+      const res = await axios.get(`http://10.110.4.222:5000/user/${userId}/challenges`);
+      const fetched = res.data.challenges;
+
+      const marked: Record<string, { marked: boolean; dotColor: string }> = {};
+      fetched.forEach((c: Challenge) => {
+        marked[c.date] = { marked: true, dotColor: '#EC4701' };
+      });
+
+      setChallenges(fetched);
+      setMarkedDates(marked);
+    } catch (err) {
+      console.error('Failed to fetch challenges:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChallenges();
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -30,10 +62,7 @@ export default function Activity() {
         <MaterialIcons name="arrow-back" size={28} color="black" />
       </TouchableOpacity>
 
-      <Image
-        style={styles.image}
-        source={require('../../assets/images/Moosement 2.png')}
-      />
+      <Image style={styles.image} source={require('../../assets/images/Moosement 2.png')} />
 
       <Text style={styles.mainTitle}>Activity</Text>
 
@@ -42,13 +71,11 @@ export default function Activity() {
         <Calendar
           current={'2025-02-01'}
           onDayPress={(day: DateObject) => {
-            console.log('Pressed day:', day.dateString);
+            setSelectedDate(day.dateString);
+            const activity = challenges.find(ch => ch.date === day.dateString);
+            setSelectedActivity(activity || null);
           }}
-          markedDates={{
-            '2025-02-01': { marked: true, dotColor: '#EC4701' },
-            '2025-02-04': { marked: true, dotColor: '#EC4701' },
-            '2025-02-05': { marked: true, dotColor: '#EC4701' },
-          }}
+          markedDates={markedDates}
           theme={{
             calendarBackground: '#e6e1dc',
             textSectionTitleColor: '#472B01',
@@ -65,31 +92,50 @@ export default function Activity() {
             textMonthFontSize: 18,
             textDayHeaderFontSize: 14,
           }}
-          style={{
-            borderRadius: 12,
-            overflow: 'hidden',
-          }}
+          style={{ borderRadius: 12, overflow: 'hidden' }}
         />
         <View style={styles.calendarPlaceholder}>
           <FontAwesome5 name="walking" size={18} />
-          <Text style={{ marginLeft: 6 }}>Sample Date Marked</Text>
+          <Text style={{ marginLeft: 6 }}>Marked Dates = Completed Activities</Text>
         </View>
       </View>
 
+      {selectedDate && (
+        <View style={[styles.streakCard, { backgroundColor: '#fff3e6' }]}>
+          <Text style={styles.streakText}>Activity on {selectedDate}</Text>
+          {selectedActivity ? (
+            <>
+              <Text style={styles.activityText}>{selectedActivity.activity}</Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${selectedActivity.streak * 20}%` }]} />
+              </View>
+            </>
+          ) : (
+            <Text style={styles.activityText}>No activity completed on this day.</Text>
+          )}
+        </View>
+      )}
+
       <Text style={styles.subTitle}>Streaks</Text>
 
-      {challenges.map((challenge) => (
-        <View key={challenge.id} style={styles.streakCard}>
-          <FontAwesome5 name="fire" size={24} color="black" style={{ marginRight: 10 }} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.streakText}>{challenge.streak} day streak</Text>
-            <Text style={styles.activityText}>{challenge.activity}</Text>
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${challenge.streak * 20}%` }]} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#140E90" />
+      ) : challenges.length === 0 ? (
+        <Text>No completed challenges yet.</Text>
+      ) : (
+        challenges.map((challenge) => (
+          <View key={challenge._id} style={styles.streakCard}>
+            <FontAwesome5 name="fire" size={24} color="black" style={{ marginRight: 10 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.streakText}>{challenge.streak} day streak</Text>
+              <Text style={styles.activityText}>{challenge.activity}</Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${challenge.streak * 20}%` }]} />
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        ))
+      )}
 
       <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)')}>
         <Text style={styles.buttonText}>Back to Home</Text>
@@ -135,6 +181,7 @@ const styles = StyleSheet.create({
   calendarPlaceholder: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 8,
   },
   subTitle: {
     fontSize: 24,
@@ -175,13 +222,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#140E90',
     paddingVertical: 12,
     width: '100%',
-    borderRadius: 25,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 10,
   },
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 16,
   },
 });
