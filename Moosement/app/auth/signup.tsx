@@ -19,7 +19,7 @@ export default function SignupScreen() {
 
   async function handleSubmit() {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/register', {
+      const response = await fetch('http://127.0.0.1:5000/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,12 +35,15 @@ export default function SignupScreen() {
       
       if (response.ok) {
         alert('User registered successfully!');
-        router.replace('/login'); 
+        console.log("got it")
+        router.replace('/(tabs)/home'); 
       } else {
+        console.log(data.error)
+
         alert(data.error || 'Something went wrong.');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:', error);
       alert('Failed to connect to the server.');
     }
   }
@@ -51,7 +54,7 @@ export default function SignupScreen() {
     <Text style={styles.mainTitle}>Moosement</Text>
       <Image
         style={styles.image} 
-        source={require('../assets/images/Moosement 2.png')} 
+        source={require('../../assets/images/Moosement 2.png')} 
       />
       <Text style={styles.title}>Sign Up</Text>
       <TextInput 
@@ -77,7 +80,7 @@ export default function SignupScreen() {
       <Text style={styles.footerText}>
         Already have an account?{' '}
 
-        <Text style={styles.link} onPress={() => router.replace('/login')} >Sign In</Text>      </Text>
+        <Text style={styles.link} onPress={() => router.replace('/auth/login')} >Sign In</Text>      </Text>
     </View>
   );
 }

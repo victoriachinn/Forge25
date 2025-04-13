@@ -1,17 +1,18 @@
-from flask import Flask, request, jsonify
-from flask import Blueprint, request, jsonify
-from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
 from config import MONGO_URI
+from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
+import certifi
 
-rewards_bp = Blueprint('reward', __name__)
+rewards_bp = Blueprint('rewards_bp', __name__)
 
-client = MongoClient(MONGO_URI)
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), tls=True, tlsCAFile=certifi.where())
 db = client["moosement"]
 users_collection = db["user_data"]
-challenges_collection = db["challenges"]
-teams_collection = db["team_data"]
+rewards_collection = db["rewards_data"]
 
 # sample rewards
 default_rewards = [
@@ -25,7 +26,7 @@ def get_rewards():
     rewards = list(rewards_collection.find({}, {"_id": 0}))
     return jsonify({"rewards": rewards})
 
-@rewards_bp.route('/api/rewards/redeem', methods=['POST'])
+@rewards_bp.route('/redeem', methods=['POST'])
 def redeem_reward():
     data = request.get_json()
     user_id = data.get("user_id")
