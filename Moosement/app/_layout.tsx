@@ -1,64 +1,37 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
-import 'react-native-reanimated';
+import { Slot, Stack } from "expo-router";
+import { useAuth } from "../lib/auth";
 
-import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: 'signup',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
-  const [fontsLoaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
+  return( <Slot/> )
+  
+/*
+  const { isAuthenticated, hasTeam } = useAuth();
 
-  // Check for font loading errors and handle them
-  useEffect(() => {
-    if (error) {
-      console.error('Font loading error:', error);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    // Hide splash screen once fonts are loaded
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-      setIsReady(true);
-    }
-  }, [fontsLoaded]);
-
-  if (!isReady) {
-    return null; // Display a blank screen while fonts are loading
+  if (!isAuthenticated) {
+    return (
+    );
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  if (!hasTeam) {
+    return (
+      <Stack
+        screenOptions={{ headerShown: false }}
+        initialRouteName="team_setup"
+      />
+    );
+  }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack initialRouteName="signup">
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Edit Profile' }} />
-      </Stack>
-    </ThemeProvider>
+    <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
+      <Stack.Screen
+        name="modal"
+        options={{
+          presentation: "modal", // or 'transparentModal'
+          headerShown: false,
+        }}
+      />
+    </Stack>
   );
+  */
 }

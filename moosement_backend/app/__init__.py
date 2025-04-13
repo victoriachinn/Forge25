@@ -12,6 +12,7 @@ def create_app():
     Initializes and configures the Flask application.
     Registers all necessary blueprints.
     """
+    
     app = Flask(__name__)
     CORS(app)  # Enable CORS for frontend communication
 

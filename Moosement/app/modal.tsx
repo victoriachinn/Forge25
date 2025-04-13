@@ -4,6 +4,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { Text } from '@/components/Themed';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { Stack } from 'expo-router';
+export const modal = true;
+
 
 export default function ModalScreen() {
   const [displayName, setDisplayName] = useState('John Doe');
@@ -49,7 +52,7 @@ export default function ModalScreen() {
     );
   };
 
-  return (
+  return (    
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.keyboardAvoidingView}
@@ -62,6 +65,7 @@ export default function ModalScreen() {
       </View>
 
       <ScrollView
+      
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >

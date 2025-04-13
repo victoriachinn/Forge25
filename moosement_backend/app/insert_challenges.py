@@ -1,9 +1,12 @@
+from config import MONGO_URI
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 
-MONGO_URI = "mongodb+srv://mshteynberg:moosementcluster@moosement.lnn1d.mongodb.net/"
-client = MongoClient(MONGO_URI)
+import certifi
+
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), tls=True, tlsCAFile=certifi.where())
 db = client["moosement"]
-challenges_collection = db["challenges"]
+challenges_collection = db["challenge_data"]
 
 # hardcoded challenges
 challenges = [
