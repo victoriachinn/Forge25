@@ -87,7 +87,7 @@ export default function HomeScreen() {
       />
       <View style={styles.header}>
         <Text style={styles.greeting}>
-          Hello there,<Text style={styles.name}> Nicky!</Text>
+          Hello there,<Text style={styles.name}> John Doe!</Text>
         </Text>
       </View>
 
@@ -194,7 +194,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#fff",
     padding: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#472B01",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#fff",
   },
   name: {
     fontSize: 24,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     width: "100%",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#fff",
   },
   card: {
     padding: 16,
@@ -392,6 +392,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 5,
     color: "#472B01",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#fff",
   },
 });
