@@ -35,16 +35,13 @@ export default function SignupScreen() {
       
       if (response.ok) {
         alert('User registered successfully!');
-        console.log("got it")
-        router.replace('/(tabs)/home'); 
+        router.replace('/login'); 
       } else {
-        console.log(data.error)
-
-        alert(data.error || 'Something went wrong.');
+        alert('Something went wrong.');
       }
     } catch (error) {
-      console.log('Error:', error);
-      alert('Failed to connect to the server.');
+      console.error('Error:', error);
+      alert("hi");
     }
   }
   
@@ -54,7 +51,7 @@ export default function SignupScreen() {
     <Text style={styles.mainTitle}>Moosement</Text>
       <Image
         style={styles.image} 
-        source={require('../../assets/images/Moosement 2.png')} 
+        source={require('../assets/images/Moosement 2.png')} 
       />
       <Text style={styles.title}>Sign Up</Text>
       <TextInput 
@@ -80,7 +77,7 @@ export default function SignupScreen() {
       <Text style={styles.footerText}>
         Already have an account?{' '}
 
-        <Text style={styles.link} onPress={() => router.replace('/auth/login')} >Sign In</Text>      </Text>
+        <Text style={styles.link} onPress={() => router.replace('/login')} >Sign In</Text>      </Text>
     </View>
   );
 }
