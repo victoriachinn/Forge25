@@ -5,6 +5,7 @@ import { Text } from '@/components/Themed';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Stack } from 'expo-router';
+import { ScrollViewBase } from 'react-native';
 export const modal = true;
 
 
@@ -65,7 +66,6 @@ export default function ModalScreen() {
       </View>
 
       <ScrollView
-      
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
@@ -131,7 +131,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingHorizontal: 30,
-    paddingBottom: 50
+    paddingBottom: 50,
+    paddingTop: 50,
   },
   header: {
     flexDirection: 'row',
