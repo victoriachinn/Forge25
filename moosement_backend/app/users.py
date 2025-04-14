@@ -50,7 +50,7 @@ def register():
         "completed_challenges": [],
         "streaks": 0,
         "role": "employee",  # Default role
-        "rewards_claimed": [],
+        "redeemed_rewards": [],  # Field name to match what frontend expects
         "team_rank": None,
         "user_avatar": None,
         "created_at": datetime.utcnow().isoformat(),
@@ -135,3 +135,77 @@ def update_profile():
                     return jsonify({"error": "Email already in use"}), 409
 
             updates[field] = data[field]
+
+# API route to get the total points for a user
+@users_bp.route("/points", methods=["GET"])
+def get_user_points():
+    # Get user_id from query parameters
+    user_id = request.args.get("user_id")
+
+    # Check that a user_id was received
+    if not user_id:
+        return jsonify({
+            "error": "Missing parameter: user_id",
+            "total_points": 0,
+            "redeemed_rewards": []
+        }), 400
+
+    try:
+        # Debug print to see the actual user_id value
+        print(f"Looking up user with ID: {user_id}")
+        
+        # Make sure user_id is a valid format before trying to convert
+        if not ObjectId.is_valid(user_id):
+            print(f"Invalid ObjectId format: {user_id}")
+            return jsonify({
+                "error": "Invalid user ID format",
+                "total_points": 0,
+                "redeemed_rewards": []
+            }), 400
+            
+        # Look up the user
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+
+        # If no user exists with that ID, return an error
+        if not user:
+            print(f"No user found with ID: {user_id}")
+            return jsonify({
+                "error": "User not found",
+                "total_points": 0,
+                "redeemed_rewards": []
+            }), 404
+
+        # Get the redeemed rewards if they exist
+        redeemed_rewards = user.get("redeemed_rewards", [])
+        
+        # If redeemed_rewards is None or not an array, set it to empty array
+        if redeemed_rewards is None or not isinstance(redeemed_rewards, list):
+            redeemed_rewards = []
+            
+        # Ensure each reward has the expected fields
+        for reward in redeemed_rewards:
+            if not isinstance(reward, dict):
+                continue
+            # Make sure reward_name exists
+            if "reward_name" not in reward:
+                reward["reward_name"] = "Unknown Reward"
+            # Make sure points_spent exists
+            if "points_spent" not in reward:
+                reward["points_spent"] = 0
+            
+        print(f"Found user with points: {user.get('total_points', 0)}")
+        
+        return jsonify({
+            "user_id": user_id,
+            "total_points": user.get("total_points", 0),
+            "redeemed_rewards": redeemed_rewards
+        }), 200
+        
+    except Exception as e:
+        print(f"Error in get_user_points: {str(e)}")
+        return jsonify({
+            "error": f"An error occurred: {str(e)}",
+            "user_id": user_id,
+            "total_points": 0,
+            "redeemed_rewards": []
+        }), 500
