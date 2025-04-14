@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 30,
-    backgroundColor: '#f8f9fa',
-    marginTop: 80,
+    backgroundColor: '#fff',
+    paddingTop: 50,
   },
   title: {
     fontSize: 24,

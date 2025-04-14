@@ -1,16 +1,20 @@
 # users_bp.py
 from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
+
+from pymongo.server_api import ServerApi
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from bson import ObjectId
 from config import MONGO_URI
+import certifi
 
-client = MongoClient(MONGO_URI)
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), tls=True, tlsCAFile=certifi.where())
+
 db = client["moosement"]
 users_collection = db["user_data"]
-challenges_collection = db["challenges"]
+challenges_collection = db["challenge_data"]
 teams_collection = db["team_data"]
 
 # Initialize the blueprint

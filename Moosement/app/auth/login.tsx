@@ -27,7 +27,9 @@ export default function LogInScreen() {
 
   async function handleSubmit() {
     try {
-      const response = await fetch("http://10.110.76.233:3000/api/login", { // may need to put your own IP address
+
+      // the URL below should run on the default flask IP address, but change it if 'flask run' says its running on a different IP/port
+      const response = await fetch("http://127.0.0.1:5000/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

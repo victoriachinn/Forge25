@@ -3,17 +3,22 @@ from bson import ObjectId
 from config import MONGO_URI
 import datetime
 
-# Connect to MongoDB
-client = MongoClient(MONGO_URI)
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+import certifi
+
+# Create a new client and connect to the server
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), tls=True, tlsCAFile=certifi.where())
 db = client["moosement"]
-teams_collection = db["teams"]
-users_collection = db["users"]
+teams_collection = db["team_data"]
+users_collection = db["user_data"]
 
 # Team Schema (for reference)
 TEAM_SCHEMA = {
-    "team_id": str,  # Unique identifier
+    "team_id": str,  # Unique identifiers
     "name": str,  # Team name
     "company_id": str,  # Company ID the team belongs to
+    "total_team_points": int,
     "created_at": str,  # Timestamp
     "updated_at": str,  # Timestamp
     "members": list,  # List of user IDs in the team
@@ -29,6 +34,8 @@ def create_team(name, company_id, creator_id):
         "team_id": str(ObjectId()),
         "name": name,
         "company_id": company_id,
+
+        "total_team_points": 0,
         "created_at": datetime.datetime.utcnow().isoformat(),
         "updated_at": datetime.datetime.utcnow().isoformat(),
         "members": [creator_id],  # Creator is the first member

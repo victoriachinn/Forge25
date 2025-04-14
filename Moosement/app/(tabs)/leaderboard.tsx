@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 export default function Leaderboard() {
   const router = useRouter();
   type LeaderboardEntry = {
-    id: string;
+    team_id: string;
     name: string;
     score: number;
   };
@@ -13,17 +13,17 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
 
 
-  const API_URL = "http://localhost:5000/";
+  const API_URL = "http://127.0.0.1:5000";
   // if I need to change to IP address of my mac run:
   //ipconfig getifaddr en0
   // replace local host with returned address
   useEffect(() => {
-    fetch('${API_URL}/api/team/leaderboard')
+    fetch(`${API_URL}/api/teams/new_leaderboard`)
       .then(response => response.json())
       .then(data => {
-        const formatted = data.leaderboard.map((team: { team_id: string; total_team_points: number })=> ({
-          id: team.team_id,
-          name: team.team_id,
+        const formatted = data.leaderboard.map((team: { name: string; team_id: string, total_team_points: number })=> ({
+          team_id: team.team_id,
+          name: team.name,
           score: team.total_team_points,
         }));
         setLeaderboardData(formatted);
@@ -46,7 +46,8 @@ export default function Leaderboard() {
       ) : (
         <FlatList
           data={leaderboardData}
-          keyExtractor={(item) => item.id.toString()}
+
+          keyExtractor={(item) => item.team_id}
           renderItem={({ item, index }) => (
             <View style={styles.row}>
               <Text style={styles.rank}>{index + 1}</Text>
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 30,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fff',
     paddingTop: 50,
     paddingBottom: 50
   },
@@ -102,12 +103,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#140E90',
+    marginRight: 30,
   },
   name: {
     fontSize: 18,
     fontWeight: 'bold',
     flex: 1,
     textAlign: 'center',
+    marginRight: 30,
   },
   score: {
     fontSize: 18,

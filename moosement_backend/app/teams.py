@@ -3,18 +3,24 @@ from models.teams import create_team, join_team
 from models.users import get_user_by_id
 from bson import ObjectId
 from config import MONGO_URI
-from pymongo import MongoClient
-import shortuuid
 
-client = MongoClient(MONGO_URI)
+from pymongo import MongoClient, DESCENDING
+from pymongo.server_api import ServerApi
+
+import shortuuid
+import certifi
+
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'), tls=True, tlsCAFile=certifi.where())
+
 db = client["moosement"]
 users_collection = db["user_data"]
-challenges_collection = db["challenges"]
+challenges_collection = db["challenge_data"]
 teams_collection = db["team_data"]
 
 teams_bp = Blueprint("teams_bp", __name__)
 
-@teams_bp.route("/teams/create", methods=["POST"])
+
+@teams_bp.route("/create", methods=["POST"])
 def create_team_route():
     """
     Allows a user to create a team.
@@ -22,20 +28,24 @@ def create_team_route():
     data = request.json
     name = data.get("name")
     company_id = data.get("company_id")
-    creator_id = data.get("creator_id")
+
+    creator_id = ObjectId(data.get("creator_id"))
 
     if not name or not company_id or not creator_id:
         return jsonify({"error": "Missing required fields"}), 400
 
-    user = get_user_by_id(creator_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+    try:
+        user = users_collection.find_one({"_id": creator_id})
+    except Exception as e:
+    # if not user:
+        return jsonify({"error": "User does not exist"}), 404
 
-    team_id = create_team(name, company_id, creator_id)
-    return jsonify({"message": "Team created successfully", "team_id": team_id}), 201
+    if user:
+        team_id = create_team(name, company_id, creator_id)
+        return jsonify({"message": "Team created successfully", "team_id": list(team_id)}), 201
 
 
-@teams_bp.route("/teams/join", methods=["POST"])
+@teams_bp.route("/join", methods=["POST"])
 def join_team_route():
     """
     Allows a user to join an existing team.
@@ -93,7 +103,7 @@ def update_leaderboard():
 def get_leaderboard():
     update_leaderboard()
     # Sorts the teams by their now updated standing to output as a list repreenting the leaderboard
-    leaderboard = list(teams_collection.find({}, {"_id": 0, "team_id": 1, "total_team_points": 1, "team_standing": 1}).sort("team_standing", 1))
+    leaderboard = list(teams_collection.find({}, {"_id": 0, "name": 1, "team_id": 1, "total_team_points": 1, "team_standing": 1}).sort("team_standing", 1))
 
     return jsonify({"leaderboard": leaderboard})
 
@@ -101,12 +111,14 @@ def get_leaderboard():
 def invite_member():
     try:
         data = request.get_json()
-        user_id = data.get("user_id")
+
+        user_id = ObjectId(data.get("user_id"))
 
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
 
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
+
+        user = users_collection.find_one({"_id": user_id})
         if not user:
             return jsonify({"error": "User not found"}), 404
 
