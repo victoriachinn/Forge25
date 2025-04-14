@@ -15,57 +15,156 @@ db = client["moosement"]
 users_collection = db["user_data"]
 rewards_collection = db["rewards_data"]
 
-# sample rewards
-default_rewards = [
-    {"name": "Dinner Gift Card", "points_required": 5000},
-    {"name": "Extra PTO Day", "points_required": 10000},
-    {"name": "Fitness Gear Credit", "points_required": 7500}
-]
+# Initialize default rewards if none exist
+def init_rewards():
+    try:
+        # Check if rewards collection is empty
+        if rewards_collection.count_documents({}) == 0:
+            print("Initializing default rewards...")
+            default_rewards = [
+                {"name": "Free Lunch Voucher", "points_required": 150},
+                {"name": "Late Start Pass", "points_required": 200},
+                {"name": "Company T-Shirt", "points_required": 300},
+                {"name": "Extra PTO Day", "points_required": 500},
+                {"name": "Gift Card", "points_required": 200}
+            ]
+            rewards_collection.insert_many(default_rewards)
+            print(f"Added {len(default_rewards)} default rewards")
+        
+        result = users_collection.update_one(
+            {"email": "Michael@gmail.com"}, 
+            {"$set": {"total_points": 1000, "points": 1000}},
+            upsert=False
+        )
+        
+        if result.matched_count > 0:
+            print("Updated points for Michael@gmail.com to 1000 points")
+        else:
+            print("User with email Michael@gmail.com not found")
+            
+    except Exception as e:
+        print(f"Error in init_rewards: {str(e)}")
+
+# Call this function when the app starts
+init_rewards()
 
 @rewards_bp.route('/rewards', methods=['GET'])
 def get_rewards():
-    rewards = list(rewards_collection.find({}, {"_id": 0}))
-    return jsonify({"rewards": rewards})
+    """
+    Returns all available rewards.
+    """
+    try:
+        rewards = list(rewards_collection.find({}, {"_id": 0}))
+        print(f"Retrieved {len(rewards)} rewards")
+        return jsonify({"rewards": rewards})
+    except Exception as e:
+        print(f"Error getting rewards: {str(e)}")
+        return jsonify({"error": str(e), "rewards": []}), 500
 
 
 @rewards_bp.route('/redeem', methods=['POST'])
 def redeem_reward():
-    data = request.get_json()
-    user_id = data.get("user_id")
-    reward_name = data.get("reward_name")
+    """
+    Allows a user to redeem a reward.
+    """
+    try:
+        data = request.get_json()
+        print(f"Redeem request: {data}")
+        
+        user_id = data.get("user_id")
+        reward_name = data.get("reward_name")
 
-    if not user_id or not reward_name:
-        return jsonify({"error": "User ID and Reward Name are required"}), 400
+        if not user_id or not reward_name:
+            return jsonify({"error": "User ID and Reward Name are required"}), 400
 
-    user = users_collection.find_one({"_id": ObjectId(user_id)})
-    reward = rewards_collection.find_one({"name": reward_name})
+        try:
+            if not ObjectId.is_valid(user_id):
+                return jsonify({"error": "Invalid user ID format"}), 400
+                
+            user = users_collection.find_one({"_id": ObjectId(user_id)})
+        except Exception as e:
+            return jsonify({"error": f"Invalid user ID format: {str(e)}"}), 400
 
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-    if not reward:
-        return jsonify({"error": "Reward not found"}), 404
+        reward = rewards_collection.find_one({"name": reward_name})
 
-    user_points = user.get("total_points", 0)
-    required_points = reward["points_required"]
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        if not reward:
+            return jsonify({"error": "Reward not found"}), 404
 
-    if user_points < required_points:
-        return jsonify({"error": "Not enough points to redeem this reward"}), 400
+        user_points = user.get("total_points", 0)
+        required_points = reward["points_required"]
 
-    # deduct points and update user history
-    users_collection.update_one(
-        {"_id": ObjectId(user_id)},
-        {
-            "$inc": {"total_points": -required_points},
-            "$push": {"redeemed_rewards": {
-                "reward_name": reward_name,
-                "points_spent": required_points,
-                "redeemed_at": datetime.utcnow().isoformat()
-            }},
-            "$set": {"updated_at": datetime.utcnow().isoformat()}
-        }
-    )
+        # Check if user already redeemed this reward
+        redeemed_rewards = user.get("redeemed_rewards", [])
+        if not isinstance(redeemed_rewards, list):
+            redeemed_rewards = []
+            
+        if any(r.get("reward_name") == reward_name for r in redeemed_rewards if isinstance(r, dict)):
+            return jsonify({"error": "Reward already redeemed"}), 400
 
-    return jsonify({
-        "message": f"Successfully redeemed {reward_name}",
-        "remaining_points": user_points - required_points
-    }), 200
+        if user_points < required_points:
+            return jsonify({"error": "Not enough points to redeem this reward"}), 400
+
+        # Update user's points and redeemed rewards
+        update_result = users_collection.update_one(
+            {"_id": ObjectId(user_id)},
+            {
+                "$inc": {"total_points": -required_points},
+                "$push": {"redeemed_rewards": {
+                    "reward_name": reward_name,
+                    "points_spent": required_points,
+                    "redeemed_at": datetime.utcnow().isoformat()
+                }},
+                "$set": {"updated_at": datetime.utcnow().isoformat()}
+            }
+        )
+
+        if update_result.modified_count == 0:
+            return jsonify({"error": "Failed to update user records"}), 500
+
+        print(f"User {user_id} redeemed {reward_name}, remaining points: {user_points - required_points}")
+        
+        return jsonify({
+            "message": f"Successfully redeemed {reward_name}",
+            "remaining_points": user_points - required_points
+        }), 200
+    except Exception as e:
+        print(f"Error in redeem_reward: {str(e)}")
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+@rewards_bp.route('/user_rewards', methods=['GET'])
+def get_user_rewards():
+    """
+    Returns the rewards redeemed by a specific user.
+    """
+    try:
+        user_id = request.args.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        try:
+            if not ObjectId.is_valid(user_id):
+                return jsonify({"error": "Invalid user ID format"}), 400
+                
+            user = users_collection.find_one({"_id": ObjectId(user_id)})
+        except:
+            return jsonify({"error": "Invalid user ID format"}), 400
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        redeemed_rewards = user.get("redeemed_rewards", [])
+        
+        # Ensure it's a list
+        if not isinstance(redeemed_rewards, list):
+            redeemed_rewards = []
+        
+        return jsonify({
+            "user_id": user_id,
+            "redeemed_rewards": redeemed_rewards
+        }), 200
+    except Exception as e:
+        print(f"Error in get_user_rewards: {str(e)}")
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
