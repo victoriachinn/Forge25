@@ -41,9 +41,15 @@ export default function CreateTeamScreen() {
         onChangeText={setTeamDescription}
       />
       
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={()=> router.replace('/(tabs)/home')}>
         <Text style={styles.buttonText}>Create Team</Text>
       </TouchableOpacity>
+
+       <Text style={styles.footerText}>
+              Already have a team to join?{' '}
+              {/* TODO: Will re-route to create team page once it is created */}
+              <Text style={styles.link} onPress={() => router.replace('/team_setup/join-team')} >Join Team</Text>
+            </Text>
     </View>
   );
 }

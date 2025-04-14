@@ -1,20 +1,21 @@
 import { Slot, Stack } from "expo-router";
 import { useAuth } from "../lib/auth";
 
+export default function RootLayout() {
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* This wraps your tab layout */}
+      <Stack.Screen options={{ headerShown: false }} name="(tabs)/home" />
 
-
-  export default function RootLayout() {
-    return (
-      <Stack>
-        {/* This wraps your tab layout */}
-        <Stack.Screen name="(tabs)/home" options={{ headerShown: false }} />
-        
-        {/* This makes /modal show as a modal */}
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: 'modal', title: 'Edit Profile' }}
-        />
-      </Stack>
-    );
-  }
-  
+      {/* This makes /modal show as a modal */}
+      <Stack.Screen
+        name="modal"
+        options={{
+          presentation: "modal",
+          headerShown: true,
+          title: "Edit Profile",
+        }}
+      />
+    </Stack>
+  );
+}

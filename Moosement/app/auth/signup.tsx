@@ -35,9 +35,9 @@ export default function SignupScreen() {
       const data = await response.json();
       
       if (response.ok) {
-        alert('User registered successfully!');
+       // alert('User registered successfully!');
         console.log("got it")
-        router.replace('/(tabs)/home'); 
+        router.replace('/team_setup/join-team'); 
       } else {
         console.log(data.error)
 

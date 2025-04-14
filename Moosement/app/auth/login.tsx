@@ -40,7 +40,7 @@ export default function LogInScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Login successful!");
+        // alert("Login successful!");
         console.log("User ID:", data.user_id);
         router.push("/(tabs)/home");
       } else {
