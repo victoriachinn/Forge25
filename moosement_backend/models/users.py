@@ -51,6 +51,7 @@ def get_user_by_id(user_id):
     """
     Fetches a user by their unique user ID.
     """
+
     try:
         _id = ObjectId(user_id)
         user = users_collection.find_one({"_id": user_id}, {"_id": 0, "password_hash": 0})

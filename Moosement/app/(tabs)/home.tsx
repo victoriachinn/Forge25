@@ -87,6 +87,7 @@ export default function HomeScreen() {
       />
       <View style={styles.header}>
         <Text style={styles.greeting}>
+
           Hello there,<Text style={styles.name}> John Doe!</Text>
         </Text>
       </View>

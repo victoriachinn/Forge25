@@ -12,6 +12,7 @@ challenges_bp = Blueprint('challenges_bp', __name__)
 client = MongoClient(MONGO_URI)
 db = client["moosement"]
 users_collection = db["user_data"]
+
 challenges_collection = db["challenge_data"]
 teams_collection = db["team_data"]
 

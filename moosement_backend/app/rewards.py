@@ -1,3 +1,4 @@
+
 from bson import ObjectId
 from datetime import datetime
 from config import MONGO_URI
@@ -25,6 +26,7 @@ default_rewards = [
 def get_rewards():
     rewards = list(rewards_collection.find({}, {"_id": 0}))
     return jsonify({"rewards": rewards})
+
 
 @rewards_bp.route('/redeem', methods=['POST'])
 def redeem_reward():

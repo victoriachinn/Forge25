@@ -46,6 +46,7 @@ export default function Leaderboard() {
       ) : (
         <FlatList
           data={leaderboardData}
+
           keyExtractor={(item) => item.team_id}
           renderItem={({ item, index }) => (
             <View style={styles.row}>

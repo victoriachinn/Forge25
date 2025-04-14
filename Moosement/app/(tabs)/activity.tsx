@@ -26,7 +26,6 @@ export default function Activity() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
       <Text style={styles.mainTitle}>Activity</Text>
 
       <View style={styles.calendar}>
@@ -110,6 +109,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     backgroundColor: "#fff",
     marginTop: -10,
+
     paddingTop: 50,
   },
   backButton: {

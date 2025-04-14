@@ -30,8 +30,9 @@ export default function TabLayout() {
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
       }}>
-      <Tabs.Screen
+      <Tabs.Screen        
         name="home"
+
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
@@ -55,6 +56,7 @@ export default function TabLayout() {
         name="challenges"
         options={{
           title: 'Challenges',
+
           tabBarIcon: ({ color }) => 
           <MaterialCommunityIcons name="weight-lifter" size={24} color={color} />
         }}
@@ -63,6 +65,7 @@ export default function TabLayout() {
         name="rewards"
         options={{
           title: 'Rewards',
+
           tabBarIcon: ({ color }) => (
             <FontAwesome5 name="medal" size={24} color={color} />
           ),

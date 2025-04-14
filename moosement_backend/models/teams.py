@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 from config import MONGO_URI
 import datetime
+
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import certifi
@@ -33,6 +34,7 @@ def create_team(name, company_id, creator_id):
         "team_id": str(ObjectId()),
         "name": name,
         "company_id": company_id,
+
         "total_team_points": 0,
         "created_at": datetime.datetime.utcnow().isoformat(),
         "updated_at": datetime.datetime.utcnow().isoformat(),

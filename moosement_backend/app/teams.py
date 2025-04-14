@@ -3,6 +3,7 @@ from models.teams import create_team, join_team
 from models.users import get_user_by_id
 from bson import ObjectId
 from config import MONGO_URI
+
 from pymongo import MongoClient, DESCENDING
 from pymongo.server_api import ServerApi
 
@@ -18,6 +19,7 @@ teams_collection = db["team_data"]
 
 teams_bp = Blueprint("teams_bp", __name__)
 
+
 @teams_bp.route("/create", methods=["POST"])
 def create_team_route():
     """
@@ -26,6 +28,7 @@ def create_team_route():
     data = request.json
     name = data.get("name")
     company_id = data.get("company_id")
+
     creator_id = ObjectId(data.get("creator_id"))
 
     if not name or not company_id or not creator_id:
@@ -108,10 +111,12 @@ def get_leaderboard():
 def invite_member():
     try:
         data = request.get_json()
+
         user_id = ObjectId(data.get("user_id"))
 
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
+
 
         user = users_collection.find_one({"_id": user_id})
         if not user:

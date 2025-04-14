@@ -1,3 +1,4 @@
+
 from config import MONGO_URI
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
