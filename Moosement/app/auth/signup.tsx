@@ -86,6 +86,11 @@ export default function SignupScreen() {
   );
 }
 
+
+SignupScreen.options = {
+  headerShown: false,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

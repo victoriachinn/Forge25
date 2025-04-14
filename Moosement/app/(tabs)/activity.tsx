@@ -102,6 +102,11 @@ export default function Activity() {
   );
 }
 
+
+Activity.options = {
+  headerShown: false,
+};
+
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",

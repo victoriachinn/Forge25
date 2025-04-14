@@ -4,17 +4,14 @@ import * as ImagePicker from 'expo-image-picker';
 import { Text } from '@/components/Themed';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-<<<<<<< HEAD
-=======
+import { router, Stack } from 'expo-router';
 import { ScrollViewBase } from 'react-native';
->>>>>>> d2f5411a5a53bdcc29febef489969204cdde9b52
 export const modal = true;
 
 
 export default function ModalScreen() {
-  const [displayName, setDisplayName] = useState('John Doe');
-  const [username, setUsername] = useState('JohnDoe');
+  const [displayName, setDisplayName] = useState('Edit Display Name');
+  const [username, setUsername] = useState('Edit Username');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -69,8 +66,6 @@ export default function ModalScreen() {
       </View>
 
       <ScrollView
-<<<<<<< HEAD
-      
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
@@ -121,58 +116,10 @@ export default function ModalScreen() {
           <Text style={styles.leaveTeamButtonText}>Leave Team</Text>
         </TouchableOpacity>
 
-=======
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <TouchableOpacity onPress={pickImage}>
-          <Image 
-            source={profileImage ? { uri: profileImage } : require('../assets/images/Moosement 2.png')} 
-            style={styles.profileImage} 
-            resizeMode="contain"
-          />
+        <TouchableOpacity style={styles.signOutButton}  onPress={() => router.replace("/auth/login")}>
+          <Text style={styles.leaveTeamButtonText}>Sign Out</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={pickImage}>
-          <Text style={styles.editProfilePictureText}>Edit Image</Text>
-        </TouchableOpacity>
-      
-        <Text style={styles.label}>Display Name</Text>
-        <TextInput
-          style={styles.input}
-          value={displayName}
-          onChangeText={setDisplayName}
-          placeholder="Name" 
-        />
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-          placeholder="Username" 
-        />
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Password" 
-          secureTextEntry
-        />
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="johndoe@johndoe.com" 
-          keyboardType="email-address"
-        />
-
-        <TouchableOpacity style={styles.leaveTeamButton} onPress={handleLeaveTeam}>
-          <Text style={styles.leaveTeamButtonText}>Leave Team</Text>
-        </TouchableOpacity>
-
->>>>>>> d2f5411a5a53bdcc29febef489969204cdde9b52
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </ScrollView>
     </KeyboardAvoidingView>
@@ -188,12 +135,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingHorizontal: 30,
-<<<<<<< HEAD
-    paddingBottom: 50
-=======
     paddingBottom: 50,
     paddingTop: 50,
->>>>>>> d2f5411a5a53bdcc29febef489969204cdde9b52
   },
   header: {
     flexDirection: 'row',
@@ -245,6 +188,14 @@ const styles = StyleSheet.create({
   },  
   leaveTeamButton: {
     backgroundColor: '#EC4701', 
+    width: '100%',
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  signOutButton: {
+    backgroundColor: '#140E90', 
     width: '100%',
     paddingVertical: 12,
     borderRadius: 5,

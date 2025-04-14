@@ -72,6 +72,9 @@ const RewardsPage: React.FC = () => {
   );
 };
 
+
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -7,7 +7,7 @@ import { useAuth } from "../lib/auth";
     return (
       <Stack>
         {/* This wraps your tab layout */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)/home" options={{ headerShown: false }} />
         
         {/* This makes /modal show as a modal */}
         <Stack.Screen
