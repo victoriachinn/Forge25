@@ -26,9 +26,6 @@ export default function Activity() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <MaterialIcons name="arrow-back" size={28} color="black" />
-      </TouchableOpacity>
 
       <Text style={styles.mainTitle}>Activity</Text>
 
@@ -113,6 +110,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     backgroundColor: "#fff",
     marginTop: -10,
+    paddingTop: 50,
   },
   backButton: {
     alignSelf: "flex-start",

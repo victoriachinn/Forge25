@@ -4,6 +4,8 @@ import { Link, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -53,14 +55,17 @@ export default function TabLayout() {
         name="challenges"
         options={{
           title: 'Challenges',
-          tabBarIcon: ({ color }) => <TabBarIcon name="trophy" color={color} />,
+          tabBarIcon: ({ color }) => 
+          <MaterialCommunityIcons name="weight-lifter" size={24} color={color} />
         }}
       />
       <Tabs.Screen
         name="rewards"
         options={{
           title: 'Rewards',
-          tabBarIcon: ({ color }) => <TabBarIcon name="star" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="medal" size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -68,7 +73,7 @@ export default function TabLayout() {
         options={{
           title: 'Activity',
           tabBarIcon: ({ color }) => (
-          <FontAwesome5 name="walking" size={24} color={color} />
+            <MaterialIcons name="local-fire-department" size={24} color="black" />
         ),
         }}
       />
@@ -77,7 +82,7 @@ export default function TabLayout() {
         options={{
           title: 'Leaderboard',
           tabBarIcon: ({ color }) => (
-          <FontAwesome5 name="ranking-star" size={24} color={color} />
+          <FontAwesome6 name="ranking-star" size={24} color={color} />
         ),
         }}
       />
