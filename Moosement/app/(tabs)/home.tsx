@@ -42,9 +42,9 @@ const mockRewards = [
 ];
 
 const mockLeaderboard: LeaderboardEntry[] = [
-  { teamName: "Team Moose", points: 520 },
-  { teamName: "Trail Blazers", points: 470 },
-  { teamName: "Step Squad", points: 430 },
+  { teamName: "Mighty Moose", points: 18000},
+  { teamName: "Step Squad", points: 15500},
+  { teamName: "Moose Tracks", points: 15200},
 ];
 
 export default function HomeScreen() {
@@ -132,7 +132,7 @@ export default function HomeScreen() {
             {topTeams.length > 0 ? (
               topTeams.map((team, index) => (
                 <View key={index} style={styles.leaderboardRow}>
-                  <Text style={styles.leaderboardTeam}>
+                  <Text style={styles.leaderboardTeam} numberOfLines={1}>
                     {["①", "②", "③"][index]}
                     {"  "}
                     {team.teamName}
@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
+    width: "100%",
   },
   leaderboardTeam: {
     fontSize: 16,
@@ -366,12 +367,14 @@ const styles = StyleSheet.create({
     color: "#EC4701", 
     flex: 1,
     marginRight: 10, 
+    maxWidth: "70%",
   },
   leaderboardPoints: {
     fontSize: 14,
     color: "#777", 
     textAlign: "right",
     width: 60,
+    minWidth: 70,
   },
   bottomNav: {
     flexDirection: "row",

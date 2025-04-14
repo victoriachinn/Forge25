@@ -76,7 +76,7 @@ export default function TabLayout() {
         options={{
           title: 'Activity',
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="local-fire-department" size={24} color="black" />
+            <MaterialIcons name="local-fire-department" size={24}/>
         ),
         }}
       />
