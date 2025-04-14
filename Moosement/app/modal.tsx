@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { router, Stack } from 'expo-router';
 import { ScrollViewBase } from 'react-native';
-import { Stack } from 'expo-router';
 export const modal = true;
 
 
@@ -115,8 +114,11 @@ export default function ModalScreen() {
         />
 
         <TouchableOpacity style={styles.leaveTeamButton} onPress={handleLeaveTeam}>
-          <Text style={styles.leaveTeamButtonText}>Leave Team</Text>
-        </TouchableOpacity>
+                  <Text style={styles.leaveTeamButtonText}>Leave Team</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.signOutButton}  onPress={() => router.replace('/auth/login')}>
+                  <Text style={styles.leaveTeamButtonText}>Sign Out</Text>
+                </TouchableOpacity>
 
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </ScrollView>
