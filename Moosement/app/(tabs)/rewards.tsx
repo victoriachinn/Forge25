@@ -213,6 +213,12 @@ const styles = StyleSheet.create({
     paddingTop:75
 
   },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
