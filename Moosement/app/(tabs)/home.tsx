@@ -88,7 +88,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.greeting}>
 
-          Hello there,<Text style={styles.name}> John Doe!</Text>
+          Let's get Started<Text style={styles.name}>!</Text>
         </Text>
       </View>
 
@@ -191,6 +191,11 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+
+HomeScreen.options = {
+  headerShown: false,
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -4,13 +4,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { Text } from '@/components/Themed';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { router, Stack } from 'expo-router';
+import { ScrollViewBase } from 'react-native';
 import { Stack } from 'expo-router';
 export const modal = true;
 
 
 export default function ModalScreen() {
-  const [displayName, setDisplayName] = useState('John Doe');
-  const [username, setUsername] = useState('JohnDoe');
+  const [displayName, setDisplayName] = useState('Edit Display Name');
+  const [username, setUsername] = useState('Edit Username');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -74,6 +76,7 @@ export default function ModalScreen() {
             style={styles.profileImage} 
             resizeMode="contain"
           />
+
         </TouchableOpacity>
 
         <TouchableOpacity onPress={pickImage}>
@@ -183,6 +186,14 @@ const styles = StyleSheet.create({
   },  
   leaveTeamButton: {
     backgroundColor: '#EC4701', 
+    width: '100%',
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  signOutButton: {
+    backgroundColor: '#140E90', 
     width: '100%',
     paddingVertical: 12,
     borderRadius: 5,

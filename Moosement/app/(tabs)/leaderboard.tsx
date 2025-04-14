@@ -65,6 +65,11 @@ export default function Leaderboard() {
   );
 }
 
+
+Leaderboard.options = {
+  headerShown: false,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -72,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 30,
     backgroundColor: '#fff',
-    paddingTop: 50,
+    paddingTop: 75,
     paddingBottom: 50
   },
   mainTitle: {

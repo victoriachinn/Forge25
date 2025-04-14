@@ -102,6 +102,11 @@ export default function Activity() {
   );
 }
 
+
+Activity.options = {
+  headerShown: false,
+};
+
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
@@ -109,8 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     backgroundColor: "#fff",
     marginTop: -10,
-
-    paddingTop: 50,
+    paddingTop: 100,
   },
   backButton: {
     alignSelf: "flex-start",

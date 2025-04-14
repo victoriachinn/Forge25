@@ -35,7 +35,7 @@ export default function JoinTeamScreen() {
         placeholder="Team Code" 
         onChangeText={(value) => handleChange('teamCode', value)}
       />
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)/home')}>
         <Text style={styles.buttonText}>Join Team</Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>

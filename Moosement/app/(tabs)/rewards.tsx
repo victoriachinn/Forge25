@@ -8,10 +8,10 @@ interface Reward {
   redeemed?: boolean;
 }
 
+
 // Updated with your actual user ID
 const USER_ID = "67fc62f0aa6e488a22503e9a";
 const API_URL = "http://127.0.0.1:5000/api";
-
 const RewardsPage: React.FC = () => {
   const router = useRouter();
   const [rewardList, setRewardList] = useState<Reward[]>([]);
@@ -149,11 +149,20 @@ const RewardsPage: React.FC = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      style={{ backgroundColor: "#fff" }}
+      contentContainerStyle={{
+        ...styles.container,
+        paddingBottom: 50, // gives room to scroll
+      }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+
       <Text style={styles.title}>Rewards</Text>
       <Image
-        style={styles.image} 
-        source={require('../../assets/images/Moosement 2.png')} 
+        style={styles.image}
+        source={require("../../assets/images/Moosement 2.png")}
       />
       <Text style={styles.pointLineText}>You have 
         <Text style={styles.pointsText}> {userPoints} </Text>
@@ -197,47 +206,42 @@ const RewardsPage: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 30,
     backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingBottom: 50,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    paddingTop:75
+
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 16,
     marginBottom: 12,
-    color: '#472B01',
-    textAlign: 'center',
+    color: "#472B01",
+    textAlign: "center",
   },
   image: {
     width: 225,
     height: 175,
     marginBottom: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   pointLineText: {
     fontSize: 20,
-    fontWeight: 'medium',
+    fontWeight: "medium",
+
     marginBottom: 20,
-    color: '#140E90',
-    textAlign: 'center',
+    color: "#140E90",
+    textAlign: "center",
   },
   pointsText: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+
     marginBottom: 20,
-    color: '#140E90',
-    textAlign: 'center',
+    color: "#140E90",
+    textAlign: "center",
   },
   noRewardsText: {
     fontSize: 16,
@@ -246,14 +250,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   rewardCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     width: 350,
     borderRadius: 12,
     marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -262,7 +266,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: "#eee",
   },
   rewardImage: {
     width: 40,
@@ -275,11 +279,11 @@ const styles = StyleSheet.create({
   },
   rewardName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   rewardPoints: {
     fontSize: 14,
-    color: '#777',
+    color: "#777",
   },
   redeemButton: {
     paddingVertical: 6,
@@ -287,8 +291,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   redeemText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   button: {
     backgroundColor: '#140E90',
