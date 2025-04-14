@@ -74,11 +74,12 @@ const RewardsPage: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 30,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+    marginTop: -10,
+
     paddingTop: 50,
   },
   title: {
@@ -133,6 +134,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 8,
     marginRight: 12,
+    marginBottom: 10,
   },
   rewardInfo: {
     flex: 1,
