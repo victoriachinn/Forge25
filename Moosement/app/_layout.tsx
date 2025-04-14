@@ -2,36 +2,18 @@ import { Slot, Stack } from "expo-router";
 import { useAuth } from "../lib/auth";
 
 
-export default function RootLayout() {
-  return( <Slot/> )
+  export default function RootLayout() {
+    return (
+      <Stack>
+        {/* This wraps your tab layout */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        
+        {/* This makes /modal show as a modal */}
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: 'modal', title: 'Edit Profile' }}
+        />
+      </Stack>
+    );
+  }
   
-/*
-  const { isAuthenticated, hasTeam } = useAuth();
-
-  if (!isAuthenticated) {
-    return (
-    );
-  }
-
-  if (!hasTeam) {
-    return (
-      <Stack
-        screenOptions={{ headerShown: false }}
-        initialRouteName="team_setup"
-      />
-    );
-  }
-
-  return (
-    <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
-      <Stack.Screen
-        name="modal"
-        options={{
-          presentation: "modal", // or 'transparentModal'
-          headerShown: false,
-        }}
-      />
-    </Stack>
-  );
-  */
-}
